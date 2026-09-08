@@ -12,6 +12,19 @@ virtual reality are outside this seven-hour slice.
 
 ## First story after Pro iteration
 
+### Active pivot: build the palace through a technical UI
+
+The presenter now prioritizes computer use of reconstruction software. Lane B is
+installing Nerfstudio in an isolated container on the reachable RTX host, using
+licensed posed photographs for the first training attempt. The agent will inspect
+and operate the real training viewer, then deliver a fresh Gaussian export to A.
+Shell setup and training launch must be labeled as shell operations. GUI interaction
+must be observed separately. The existing licensed room remains the working fallback.
+
+Lane A keeps the palace import/recall experience stable. Lane C captures the actual
+reconstruction lesson and its UI evidence. The earlier public-issue story below is
+the fallback, not a second integration to build in parallel.
+
 "Remember the fix."
 
 Recover a useful technical lesson from a public issue or documentation through its

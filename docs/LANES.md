@@ -1,5 +1,18 @@
 # Three lanes / seven hours
 
+## Current handoff: reconstruction UI pivot
+
+- A: preserve the working viewer; import B's fresh Gaussian export when available.
+- B: coordinator owns the isolated RTX trainer setup and first 10-step probe.
+  A bounded dataset agent obtains licensed posed photographs; a separate agent
+  identifies real Nerfstudio viewer controls. Neither edits the integration tree.
+- C: capture the reconstruction UI lesson with evidence, then use the existing
+  exporter and palace import. Do not describe shell commands as computer use.
+
+Child agents are authorized when tasks have separate ownership and shorten the
+critical path. Keep calls bounded to conserve Astra credits; no recursive Codex CLI
+or paid API jobs. The following milestones retain the original allocation.
+
 The coordinator owns integration and shared files. Teammates claim A, B, or C.
 The first Codex wave completed A, B, and the C exporter in isolated worktrees.
 Results are assembled on `integration/first-palace`; those bounded workers have
