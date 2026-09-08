@@ -67,7 +67,8 @@ are invented, duplicated, or discarded to fill the capsule.
 Output contains:
 
 - `palace.json`: schema v0, plus `capsule: {id, title, frozenAt: null}`. Five
-  anchors follow the viewer's default spacing around `scene.camera.target`, with
+  anchors follow the viewer's layout around `scene.camera.target`, spaced at
+  20% of the camera-to-target distance, with
   one memory per populated anchor and any remaining anchors empty.
 - `assets/`: byte copies under unique relative paths.
 - `manifest.json`: an `assets` inventory with `asset`, `bytes`, and `sha256` per

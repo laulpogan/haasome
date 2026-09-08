@@ -52,6 +52,21 @@ class CapsuleTests(unittest.TestCase):
     def run_assembler(self):
         return assemble(self.scene, self.bundles, "Selected capsule", self.output)
 
+    def test_anchor_spacing_at_live_room_camera_distance(self):
+        # Synthetic scene at the reported live-room scale, with a nonzero target.
+        self.scene_record["camera"] = {"position": [1, 2, 3.312], "target": [1, 2, 3]}
+        self.write(self.scene, self.scene_record)
+        palace = json.loads(self.run_assembler().read_text())
+        expected = [
+            [0.8752, 2, 3.03744], [0.9376, 2, 3.01872], [1, 2, 3],
+            [1.0624, 2, 3.01872], [1.1248, 2, 3.03744],
+        ]
+        for anchor, position in zip(palace["anchors"], expected):
+            for actual, coordinate in zip(anchor["position"], position):
+                self.assertAlmostEqual(actual, coordinate)
+        self.assertAlmostEqual(palace["anchors"][1]["position"][0]
+                               - palace["anchors"][0]["position"][0], 0.0624)
+
     def test_generated_scene_preserves_provenance(self):
         self.scene_record["provenance"] = {
             "kind": "generated", "attribution": "Synthetic generated-scene packaging test",
