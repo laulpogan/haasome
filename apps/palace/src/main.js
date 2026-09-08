@@ -6,6 +6,7 @@ import { freezeCapsule, unpackCapsule, capsuleBlob } from './capsule.js';
 import { saveLocal, loadLocal } from './storage.js';
 import { decodeSelectedMedia } from './media.js';
 import { mountCapture } from './capture.js';
+import { mountObjectMemory } from './object-memory.js';
 import './style.css';
 
 const $ = (id) => document.getElementById(id);
@@ -14,7 +15,7 @@ const button = (label, action) => { const b = node('button',label); b.onclick = 
 const notice = (message) => { $('notice').textContent = message; };
 let palace = {schemaVersion:0,scene:null,anchors:defaultAnchors(),memories:[]};
 let assets = new Map(), selected = palace.anchors[0].id, activeMemory = null, recall = null;
-let renderer, controls, mesh, loadGeneration = 0;
+let renderer, controls, mesh, objectUI, sceneHash = null, loadGeneration = 0;
 let mediaUrls = [], pins = [], sceneReady = false, creatingMemory = false;
 const world = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(60,1,0.01,10000);
@@ -32,6 +33,7 @@ try {
   new ResizeObserver(resize).observe(room); resize();
   renderer.setAnimationLoop(() => {
     controls.update(); renderer.render(world,camera);
+    objectUI?.frame(performance.now());
     for (const {anchor,el} of pins) {
       const p = new THREE.Vector3(...anchor.position).project(camera);
       el.hidden = !sceneReady || p.z < -1 || p.z > 1 || Math.abs(p.x)>1 || Math.abs(p.y)>1;
@@ -68,6 +70,7 @@ function requireEditable() {
   if (frozen()) throw new Error('Frozen capsule is read-only. Make editable copy first.');
 }
 function renderUI() {
+  objectUI?.refresh();
   $('capsule-title').value = palace.capsule?.title || 'A moment to keep';
   $('capsule-title').disabled = frozen();
   $('capsule-status').textContent = frozen() ? `Frozen ${palace.capsule.frozenAt} · Read-only snapshot` : 'Editable draft';
@@ -154,7 +157,8 @@ function renderUI() {
   }; label.append(picker); card.append(label);
 }
 async function loadScene() {
-  const generation = ++loadGeneration; sceneReady = false;
+  const generation = ++loadGeneration; sceneReady = false; sceneHash = null;
+  objectUI?.refresh();
   if (mesh) { world.remove(mesh); mesh.dispose(); mesh = null; }
   $('empty').hidden = false; $('render-status').textContent = 'Waiting for a scene';
   home();
@@ -173,11 +177,14 @@ async function loadScene() {
   try {
     const bytes = new Uint8Array(await file.arrayBuffer());
     if (generation !== loadGeneration) return;
-    candidate = new SplatMesh({fileBytes:bytes,fileName:s.asset,fileType:s.format === 'sog' ? SplatFileType.PCSOGSZIP : s.format});
+    const digest = await crypto.subtle.digest('SHA-256',bytes);
+    if (generation !== loadGeneration) return;
+    const hash = [...new Uint8Array(digest)].map(b=>b.toString(16).padStart(2,'0')).join('');
+    candidate = new SplatMesh({minRaycastOpacity:0.5,fileBytes:bytes,fileName:s.asset,fileType:s.format === 'sog' ? SplatFileType.PCSOGSZIP : s.format});
     await candidate.initialized;
     if (generation !== loadGeneration) { candidate.dispose(); return; }
     candidate.position.fromArray(s.transform.position); candidate.quaternion.fromArray(s.transform.rotation); candidate.scale.setScalar(s.transform.scale);
-    mesh = candidate; world.add(mesh); sceneReady = true; $('empty').hidden = true;
+    mesh = candidate; world.add(mesh); sceneReady = true; sceneHash = hash; objectUI?.refresh(); $('empty').hidden = true;
     $('render-status').textContent = `Gaussian splats loaded · ${((performance.now()-start)/1000).toFixed(2)}s`;
   } catch (error) {
     candidate?.dispose(); if (generation !== loadGeneration) return;
@@ -322,4 +329,5 @@ try {
   if (stored) { palace = validatePalace(stored.palace); if (!frozen()) completeAnchors(palace); assets = new Map(stored.assets); selected = palace.anchors[0].id; notice('Restored the saved palace and its local assets.'); }
 } catch (error) { notice(`Saved palace unavailable: ${error.message}. Reimport your bundle.`); }
 mountCapture({importFiles, requireEditable, sceneReady:()=>sceneReady});
+objectUI = renderer ? mountObjectMemory({getPalace:()=>palace,getMesh:()=>sceneReady?mesh:null,getHash:()=>sceneHash,camera,controls,canvas:renderer.domElement,notice,requireEditable,openMemory:id=>{const anchor=palace.anchors.find(a=>a.memoryIds.includes(id));if(anchor)selected=anchor.id;activeMemory=id;recall=null;renderUI();}}) : null;
 renderUI(); await loadScene();

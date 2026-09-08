@@ -42,3 +42,24 @@ test('base64 validation uses bounded stack for multi-megabyte assets and rejects
     c.assets[0].data=data; assert.throws(()=>validateCapsule(c),/Invalid asset base64/);
   }
 });
+
+import * as THREE from 'three';
+import {validateObjectMemory,bindingCurrent,findObjects,sampleRegion} from '../src/object-memory.js';
+test('surface samples follow mesh transform and reject background geometry misses',()=>{
+  const mesh=new THREE.Mesh(new THREE.PlaneGeometry(10,10),new THREE.MeshBasicMaterial());
+  mesh.position.set(4,2,-3);mesh.scale.setScalar(2);mesh.rotation.y=.3;
+  const camera=new THREE.PerspectiveCamera(60,1,.01,100);camera.position.set(4,2,8);camera.lookAt(mesh.position);camera.updateMatrixWorld();
+  const region=sampleRegion(mesh,camera,new THREE.Vector2(0,0),700);
+  assert.equal(region.samples.length,9);for(const p of region.samples)assert.ok(Math.abs(p[2])<1e-6);
+  camera.lookAt(40,2,8);camera.updateMatrixWorld();assert.throws(()=>sampleRegion(mesh,camera,new THREE.Vector2(0,0),700),/Background miss/);
+});
+test('object identity, memory search, frozen copying and stale scenes preserve boundaries',async()=>{
+  const p=fixture(),hash='a'.repeat(64),o={id:'object-1',label:'Table',status:'confirmed',binding:{sceneId:p.scene.id,assetHash:hash,samples:Array.from({length:5},(_,i)=>[i*.01,0,0]),tolerance:.02},observations:[{kind:'manual-surface',at:'2026-09-08T22:00:00Z',cameraPosition:[0,1,3],cameraTarget:[0,0,0]}],links:[{memoryId:p.memories[0].id,kind:'user-association',reason:'A reminder of a trip'}],corrections:[]};
+  p.objectMemory={version:1,objects:[o]};validatePalace(p);
+  assert.ok(bindingCurrent(o,p.scene,hash));assert.equal(bindingCurrent(o,p.scene,'b'.repeat(64)),false);assert.equal(bindingCurrent(o,{...p.scene,id:'new'},hash),false);
+  assert.equal(findObjects([o],p.memories,'trip')[0],o);assert.equal(findObjects([o],p.memories,'unrelated').length,0);
+  const frozen=await freezeCapsule(p,new Map([[p.scene.asset,new Blob(['scene'])]]),'Objects');p.objectMemory.objects[0].label='Changed';assert.equal(frozen.palace.objectMemory.objects[0].label,'Table');
+  for(const change of [o=>o.binding.samples=[[0,0,0]],o=>o.binding.assetHash='unknown',o=>o.links[0].memoryId='missing',o=>o.observations[0].kind='pretend-detector',o=>o.binding.samples[0][0]=Infinity]) {
+    const bad=structuredClone(frozen.palace);change(bad.objectMemory.objects[0]);assert.throws(()=>validateObjectMemory(bad.objectMemory,bad));
+  }
+});
