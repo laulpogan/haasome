@@ -1,3 +1,5 @@
+import { recognitionAssets } from './recognition.js';
+import { validateObjectMemory } from './object-memory.js';
 const fail = (message) => { throw new Error(message); };
 const text = (v, name) => typeof v === 'string' && v.trim() ? v : fail(`${name} must be text.`);
 const vector = (v, n, name) => Array.isArray(v) && v.length === n && v.every(Number.isFinite) ? v : fail(`${name} must contain ${n} finite numbers.`);
@@ -56,6 +58,8 @@ export function validatePalace(p) {
     text(a.label, 'Anchor label'); vector(a.position, 3, 'Anchor position');
     if (!Array.isArray(a.memoryIds) || a.memoryIds.some(id => !p.memories.some(m => m.id === id))) fail('Anchor references an unknown memory.');
   }
+  validateObjectMemory(p.objectMemory, p);
+  for (const path of recognitionAssets(p.objectMemory)) assetPath(path);
   return p;
 }
 export function completeAnchors(p) {

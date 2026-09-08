@@ -1,7 +1,9 @@
+import { recognitionAssets, verifyRecognitionEvidence } from './recognition.js';
 import {assetPath, validatePalace, resolveAsset} from './contract.js';
 
 export function referencedAssets(palace) {
   return [...new Set([
+    ...recognitionAssets(palace.objectMemory),
     ...(palace.scene ? [palace.scene.asset] : []),
     ...palace.memories.flatMap(m => [...m.media.map(x => x.asset), ...(m.source.evidenceAsset ? [m.source.evidenceAsset] : [])]),
   ])];
@@ -66,6 +68,7 @@ export function capsuleBlob(container) {
 
 export async function freezeCapsule(palace, assets, title) {
   const snapshot = structuredClone(validatePalace(palace));
+  await verifyRecognitionEvidence(snapshot.objectMemory,assets,resolveAsset);
   if (!snapshot.capsule?.frozenAt) snapshot.capsule = {id:crypto.randomUUID(), title:title.trim(), frozenAt:new Date().toISOString()};
   validatePalace(snapshot);
   const packed = [];
