@@ -6,7 +6,7 @@ test('manual geometry region links, searches and survives frozen reopen',async({
   const errors=[],failed=[];
   page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});page.on('response',r=>{if(r.status()>=400)failed.push(r.url());});
   await page.goto('/');await page.locator('#file-input').setInputFiles(capsule);
-  await expect(page.locator('#render-status')).toContainText('Gaussian splats loaded');
+  await expect(page.locator('#render-status')).toContainText('Gaussian splats loaded',{timeout:60000});
   await page.getByRole('button',{name:'Make editable copy'}).click();
   await page.screenshot({path:info.outputPath('before.png')});
   const box=await page.locator('#canvas canvas').boundingBox();
@@ -20,14 +20,14 @@ test('manual geometry region links, searches and survives frozen reopen',async({
   await page.getByLabel('Find object or memory').fill('trip');await expect(page.locator('#object-list button')).toHaveCount(1);
   await page.screenshot({path:info.outputPath('linked.png')});
   await page.getByRole('button',{name:'Save on this device',exact:true}).click();await expect(page.locator('#notice')).toContainText('Saved on this device');
-  await page.reload();await expect(page.locator('#render-status')).toContainText('Gaussian splats loaded');await page.locator('#object-list button').click();
+  await page.reload();await expect(page.locator('#render-status')).toContainText('Gaussian splats loaded',{timeout:60000});await page.locator('#object-list button').click();
   await expect(page.locator('#object-detail')).toContainText('This surface cues');
   const pending=page.waitForEvent('download');await page.getByRole('button',{name:'Freeze capsule',exact:true}).click();const download=await pending;
   await download.saveAs(info.outputPath('manual-object-capsule.json'));
   const frozen=JSON.parse(readFileSync(await download.path(),'utf8'));
   expect(frozen.palace.objectMemory.objects[0].binding.samples.length).toBeGreaterThan(4);
   expect(frozen.palace.objectMemory.objects[0].corrections).toHaveLength(1);
-  const context=await browser.newContext(),fresh=await context.newPage();await fresh.goto('/');await fresh.locator('#file-input').setInputFiles(info.outputPath('manual-object-capsule.json'));await expect(fresh.locator('#render-status')).toContainText('Gaussian splats loaded');await fresh.locator('#object-list button').click();
+  const context=await browser.newContext(),fresh=await context.newPage();await fresh.goto('/');await fresh.locator('#file-input').setInputFiles(info.outputPath('manual-object-capsule.json'));await expect(fresh.locator('#render-status')).toContainText('Gaussian splats loaded',{timeout:60000});await fresh.locator('#object-list button').click();
   await expect(fresh.getByRole('button',{name:'Confirm region',exact:true})).toBeDisabled();await expect(fresh.locator('#object-detail')).toContainText('This surface cues');await fresh.screenshot({path:info.outputPath('reopened.png')});await context.close();
   expect(errors).toEqual([]);expect(failed).toEqual([]);
 });

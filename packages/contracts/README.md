@@ -58,3 +58,25 @@ media, and evidence referenced by the palace. Missing references reject import o
 freeze. Reopen this container as one file. A frozen snapshot requires an editable
 copy before placement/content changes. This preserves bytes; it does not authenticate
 historical claims. Generated scene provenance displays as an imagined setting.
+
+## Object-memory sidecar v1
+
+`palace.objectMemory` is optional: `{version: 1, objects: [...]}`. The viewer's
+`object-memory.js` produces it from actual Spark raycast hits and consumes it for
+surface selection, highlighting, association and text search. Capsule v1 carries
+it inside the palace without changing the container format.
+
+Each object has a stable application `id`, editable `label`, `status` (`proposed`,
+`confirmed`, or `rejected`), `binding`, `observations`, `links`, and `corrections`.
+The binding names the exact `sceneId` and SHA-256 `assetHash`, plus 5–256 mesh-local
+surface `samples` and a positive local `tolerance`. Unlike legacy anchors, these
+samples follow the scene transform. They are not stable Gaussian indices or a
+segmentation mask. A scene ID/hash mismatch makes the binding stale and excludes
+it from surface picking and highlighting.
+
+Current observations are `manual-surface` records with observation time `at` and
+mesh-local camera position/target. Links contain an existing `memoryId`, a stated
+`reason`, and kind `user-association`. They do not establish event location.
+Corrections preserve renamed labels and times. Confirmation is a user action;
+this version does not claim automatic recognition or multi-view validation.
+Frozen capsules retain these fields and require an editable copy before mutation.

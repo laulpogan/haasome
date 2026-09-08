@@ -24,6 +24,8 @@ positions do not establish object recognition. See the measured evidence in
 
 Three active lanes improve [scene quality, object memory and targeted collection](docs/QUALITY-GOALS.md).
 The coordinator integrates their verified work on `integration/demo-polish`.
+The manual geometry-region milestone from `73ef925` is now integrated; automatic
+recognition and multi-view validation remain pending.
 
 - A recognizable scene that stays useful across the demonstrated camera views.
 - Memories bound to confirmed scene objects or regions, with preserved source facts.
