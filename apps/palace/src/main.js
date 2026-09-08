@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { SparkRenderer, SplatMesh, SplatFileType } from '@sparkjsdev/spark';
 import { assetPath, validateScene, validateMemories, validatePalace, defaultAnchors, completeAnchors, resolveAsset } from './contract.js';
+import { freezeCapsule, unpackCapsule } from './capsule.js';
 import { saveLocal, loadLocal } from './storage.js';
 import './style.css';
 
@@ -60,7 +61,20 @@ function showAsset(parent,path,kind,alt) {
   el.onerror = () => { el.replaceWith(missing(`Cannot display ${path}. Check the media format.`)); };
   parent.append(el);
 }
+const frozen = () => Boolean(palace.capsule?.frozenAt);
+function requireEditable() {
+  if (frozen()) throw new Error('Frozen capsule is read-only. Make editable copy first.');
+}
 function renderUI() {
+  $('capsule-title').value = palace.capsule?.title || 'A moment to keep';
+  $('capsule-title').disabled = frozen();
+  $('capsule-status').textContent = frozen() ? `Frozen ${palace.capsule.frozenAt} · Read-only snapshot` : 'Editable draft';
+  $('editable').hidden = !frozen();
+  $('empty-import').disabled = frozen();
+  $('placement').querySelector('summary').textContent = frozen() ? 'Place coordinates (read-only)' : 'Edit this place';
+  $('empty').querySelector('small').textContent = frozen() ? 'No scene is loaded. This snapshot is read-only.' : 'No scene is loaded. Anchor positions are editable starting points.';
+  $('freeze').textContent = frozen() ? 'Download frozen capsule' : 'Freeze capsule';
+  for (const el of $('place-form').elements) el.disabled = frozen();
   for (const url of mediaUrls) URL.revokeObjectURL(url); mediaUrls = [];
   $('places').replaceChildren(); $('pins').replaceChildren(); pins = [];
   palace.anchors.forEach((a,i) => {
@@ -83,7 +97,7 @@ function renderUI() {
     }
   }
   const memories = a.memoryIds.map(id => palace.memories.find(m => m.id === id));
-  if (!memories.length) { card.append(node('h2',a.label),node('p','A place waiting for a story. Select this place, then import memories.json and its evidence files.'),node('small','Five places are starting points. Rename and position them on objects in your room.')); return; }
+  if (!memories.length) { card.append(node('h2',a.label),node('p', frozen() ? 'No memory was saved at this place. Visit another place to recall its story.' : 'A place waiting for a story. Select this place, then import memories.json and its evidence files.'),node('small', frozen() ? 'Make an editable copy to add memories or change places.' : 'Five places are starting points. Rename and position them on objects in your room.')); return; }
   const m = memories.find(x => x.id === activeMemory) || memories[0]; activeMemory = m.id;
   if (memories.length > 1) {
     const picker = node('select'); picker.className = 'memory-picker'; picker.setAttribute('aria-label','Memory at this place');
@@ -93,13 +107,23 @@ function renderUI() {
   for (const media of m.media) showAsset(card,media.asset,media.kind,media.alt);
   const source = node('section',null,'source');
   const kind = {fixture:'Fixture — synthetic content',manual:'Manual import', 'computer-use':'Computer-use record — capture claimed by producer'}[m.source.kind];
-  source.append(node('strong',kind),node('p',m.source.app),node('p',m.source.locator),node('p',m.source.capturedAt));
-  if (m.source.evidenceAsset) showAsset(source,m.source.evidenceAsset,'image','Source evidence');
+  source.append(node('strong',kind),node('p',m.source.app),node('p',m.source.locator),node('p',`Source captured: ${m.source.capturedAt}`));
+  if (m.source.evidenceAsset) {
+    source.append(node('p', resolveAsset(assets,m.source.evidenceAsset) ? 'Saved evidence supplied — source truth not independently verified.' : 'Evidence referenced but missing.'));
+    const blob = resolveAsset(assets,m.source.evidenceAsset);
+    if (!blob || blob.type.startsWith('image/') || /\.(png|jpe?g|webp|gif)$/i.test(m.source.evidenceAsset)) showAsset(source,m.source.evidenceAsset,'image','Source evidence');
+    else {
+      const link = node('a','Download saved evidence');
+      const url = URL.createObjectURL(blob); mediaUrls.push(url); link.href = url; link.download = m.source.evidenceAsset.split('/').pop(); source.append(link);
+    }
+  }
   else source.append(node('p','No source evidence supplied.'));
   card.append(source);
   const label = node('label','Move memory to'); const picker = node('select'); picker.setAttribute('aria-label','Move memory to');
   palace.anchors.forEach(x => { const option = node('option',x.label); option.value = x.id; picker.append(option); }); picker.value = a.id;
+  picker.disabled = frozen();
   picker.onchange = () => {
+    if (frozen()) return;
     for (const anchor of palace.anchors) anchor.memoryIds = anchor.memoryIds.filter(id => id !== m.id);
     palace.anchors.find(x => x.id === picker.value).memoryIds.push(m.id); selectAnchor(picker.value); notice('Placement updated. Save on this device to keep it.');
   }; label.append(picker); card.append(label);
@@ -110,7 +134,7 @@ async function loadScene() {
   $('empty').hidden = false; $('render-status').textContent = 'Waiting for a scene';
   home();
   const s = palace.scene;
-  $('scene-kind').textContent = s ? {captured:'Captured room', 'licensed-sample':'Licensed sample — not your room', fixture:'Fixture — not a captured room'}[s.provenance.kind] : 'No room imported';
+  $('scene-kind').textContent = s ? {generated:'Generated setting — not a captured place',captured:'Captured room', 'licensed-sample':'Licensed sample — not your room', fixture:'Fixture — not a captured room'}[s.provenance.kind] : 'No room imported';
   $('scene-title').textContent = s ? 'Memory palace' : 'Give a memory a place.';
   $('scene-id').textContent = s ? `Scene ID: ${s.id}` : '';
   $('attribution').textContent = s?.provenance.attribution || 'Choose a room bundle to begin.';
@@ -145,14 +169,28 @@ async function importFiles(files) {
     nextAssets.set(path,file);
     if (file.name.endsWith('.json')) {
       const value = JSON.parse(await file.text());
-      if (Array.isArray(value) || value?.schemaVersion !== undefined || (value?.asset && value?.camera)) documents.push(value);
+      if (Array.isArray(value) || value?.capsuleVersion !== undefined || value?.schemaVersion !== undefined || (value?.asset && value?.camera)) documents.push(value);
     }
   }
+  const capsules = documents.filter(x => x?.capsuleVersion !== undefined);
+  if (capsules.length) {
+    if (files.length !== 1 || capsules.length !== 1) throw new Error('Import one capsule container by itself.');
+    const container = capsules[0];
+    const importedAssets = unpackCapsule(container);
+    palace = structuredClone(container.palace); assets = importedAssets;
+    selected = palace.anchors[0].id; activeMemory = null; recall = null;
+    renderUI(); await loadScene(); notice('Capsule reopened with its saved assets.'); return;
+  }
+  requireEditable();
   let next = structuredClone(palace);
   // Full palace establishes assembly; scene and memory handoffs can then augment it.
   const full = documents.filter(x => !Array.isArray(x) && x.schemaVersion !== undefined && 'scene' in x);
   if (full.length > 1) throw new Error('Select only one full palace JSON at a time.');
-  if (full.length) next = completeAnchors(validatePalace(full[0]));
+  if (full.length) {
+    next = validatePalace(full[0]);
+    if (next.capsule?.frozenAt) throw new Error('Reopen frozen snapshots using their portable capsule container.');
+    next = completeAnchors(next);
+  }
   const scenes = documents.filter(x => !Array.isArray(x) && x.asset && x.camera);
   if (scenes.length > 1) throw new Error('Select only one scene.json at a time.');
   if (scenes.length) {
@@ -180,7 +218,7 @@ for (const id of ['folder-input','file-input']) $(id).onchange = async (event) =
 };
 $('home').onclick = home;
 $('place-form').onsubmit = (event) => {
-  event.preventDefault(); const position = ['x','y','z'].map(key => Number($(key).value));
+  event.preventDefault(); if (frozen()) return; const position = ['x','y','z'].map(key => Number($(key).value));
   const label = $('place-label').value.trim(); if (!label || !position.every(Number.isFinite)) return;
   const a = palace.anchors.find(x => x.id === selected); a.label = label; a.position = position; renderUI(); notice('Place updated. Save on this device to keep it.');
 };
@@ -198,12 +236,39 @@ $('save').onclick = async () => {
   finally { $('save').disabled = false; }
 };
 $('export').onclick = () => {
+  if (frozen()) { $('freeze').onclick(); return; }
   const url = URL.createObjectURL(new Blob([JSON.stringify(palace,null,2)],{type:'application/json'}));
   const link = node('a'); link.href = url; link.download = 'palace.json'; link.click(); setTimeout(() => URL.revokeObjectURL(url),1000);
   notice('Exported palace.json. Keep it beside the original assets; JSON does not contain media.');
 };
+function downloadJSON(value, name) {
+  const url = URL.createObjectURL(new Blob([JSON.stringify(value)],{type:'application/json'}));
+  const link = node('a'); link.href = url; link.download = name; link.click(); setTimeout(() => URL.revokeObjectURL(url),1000);
+}
+$('capsule-title').onchange = () => {
+  if (frozen()) return;
+  palace.capsule = {id:palace.capsule?.id || crypto.randomUUID(), title:$('capsule-title').value.trim() || 'A moment to keep'};
+  renderUI();
+};
+$('freeze').onclick = async () => {
+  $('freeze').disabled = true;
+  try {
+    const current = palace, currentAssets = assets, before = JSON.stringify(palace);
+    const container = await freezeCapsule(current,currentAssets,$('capsule-title').value);
+    if (palace !== current || assets !== currentAssets || JSON.stringify(palace) !== before) throw new Error('Palace changed during freeze. Try again.');
+    downloadJSON(container,`capsule-${container.palace.capsule.id}-${crypto.randomUUID()}.json`);
+    palace = container.palace; renderUI(); notice('Frozen capsule downloaded with referenced assets. Keep this snapshot file; edits require a new copy.');
+  } catch (error) { notice(`Freeze failed: ${error.message}`); }
+  finally { $('freeze').disabled = false; }
+};
+$('editable').onclick = () => {
+  if (!frozen()) return;
+  palace = structuredClone(palace);
+  palace.capsule = {id:crypto.randomUUID(),title:palace.capsule.title};
+  renderUI(); notice('Editable copy created. The downloaded snapshot remains unchanged. Save or freeze this copy separately.');
+};
 try {
   const stored = await loadLocal();
-  if (stored) { palace = completeAnchors(validatePalace(stored.palace)); assets = new Map(stored.assets); selected = palace.anchors[0].id; notice('Restored the saved palace and its local assets.'); }
+  if (stored) { palace = validatePalace(stored.palace); if (!frozen()) completeAnchors(palace); assets = new Map(stored.assets); selected = palace.anchors[0].id; notice('Restored the saved palace and its local assets.'); }
 } catch (error) { notice(`Saved palace unavailable: ${error.message}. Reimport your bundle.`); }
 renderUI(); await loadScene();

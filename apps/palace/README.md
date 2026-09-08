@@ -54,6 +54,45 @@ An empty local draft can have scene=null; import a scene before sharing a comple
 palace. Asset paths cannot traverse directories or fetch remote URLs. Text and
 source locators render as text, never HTML or executable links.
 
+## Portable time capsule
+
+Enter a capsule title, then choose **Freeze capsule**. The viewer downloads one
+JSON file with `{capsuleVersion:1, palace, assets}`. The palace retains schema v0
+and adds `capsule: {id, title, frozenAt}`. Each asset entry contains its referenced
+bundle path, MIME `type`, and base64 `data`. Freeze rejects missing or ambiguous
+referenced scene, media, or evidence assets; unrelated imported files stay out.
+The scene may be null. Three memories from two apps need no schema change.
+
+Import the container alone through **Import files**, including in a fresh browser.
+The viewer validates the palace, metadata, paths, duplicate entries, base64, and
+reference completeness before replacing the current view and asset map. Container
+paths resolve exactly; a prior browser asset cannot fill a missing container entry.
+Scene provenance also accepts `generated`, shown as “Generated setting — not a
+captured place”. Source capture dates and evidence labels remain visible. A
+producer's computer-use claim does not establish source truth. The viewer infers
+no date/place correlation or relationship between records.
+
+Frozen capsules disable title, anchor, and memory placement changes and reject
+imports that would augment them. Recall, device save/reload, and opening another
+capsule remain available. **Make editable copy** creates a new ID and removes
+`frozenAt`. Downloaded snapshots are never opened for writing; every capsule
+download uses a new filename. A raw JSON file can still be edited outside the
+viewer: this is a read-only application snapshot, not a signed authenticity proof.
+**Export JSON** retains the existing asset-free palace export for editable drafts;
+for frozen capsules it downloads the portable container with the same snapshot.
+
+Validation is wired through the file picker in `src/main.js`; packing and decoding
+live in `src/capsule.js`, with schema validation in `src/contract.js`. Coordinator
+owns the shared contract documentation. The browser assembles the whole container
+in memory; base64 adds size. Large scene/video limits have not been measured.
+
+The capsule Playwright tests use only generic synthetic records (three memories,
+two synthetic source apps), a generated test pixel, and one synthetic Gaussian.
+They cover missing-asset rejection, byte-preserving portable import in a fresh
+browser context, source labels, rendering, frozen edit guards, recall, persistence,
+and editable copies without modifying the downloaded snapshot. They establish no
+Photos/WhatsApp capture, real memory, Marble scene, or inferred correlation.
+
 ## Verification
 
 ```sh
