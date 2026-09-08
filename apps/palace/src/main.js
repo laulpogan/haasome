@@ -2,9 +2,10 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { SparkRenderer, SplatMesh, SplatFileType } from '@sparkjsdev/spark';
 import { assetPath, validateScene, validateMemories, validatePalace, defaultAnchors, completeAnchors, resolveAsset } from './contract.js';
-import { freezeCapsule, unpackCapsule } from './capsule.js';
+import { freezeCapsule, unpackCapsule, capsuleBlob } from './capsule.js';
 import { saveLocal, loadLocal } from './storage.js';
 import { decodeSelectedMedia } from './media.js';
+import { mountCapture } from './capture.js';
 import './style.css';
 
 const $ = (id) => document.getElementById(id);
@@ -291,7 +292,7 @@ $('export').onclick = () => {
   notice('Exported palace.json. Keep it beside the original assets; JSON does not contain media.');
 };
 function downloadJSON(value, name) {
-  const url = URL.createObjectURL(new Blob([JSON.stringify(value)],{type:'application/json'}));
+  const url = URL.createObjectURL(capsuleBlob(value));
   const link = node('a'); link.href = url; link.download = name; link.click(); setTimeout(() => URL.revokeObjectURL(url),1000);
 }
 $('capsule-title').onchange = () => {
@@ -320,4 +321,5 @@ try {
   const stored = await loadLocal();
   if (stored) { palace = validatePalace(stored.palace); if (!frozen()) completeAnchors(palace); assets = new Map(stored.assets); selected = palace.anchors[0].id; notice('Restored the saved palace and its local assets.'); }
 } catch (error) { notice(`Saved palace unavailable: ${error.message}. Reimport your bundle.`); }
+mountCapture({importFiles, requireEditable, sceneReady:()=>sceneReady});
 renderUI(); await loadScene();

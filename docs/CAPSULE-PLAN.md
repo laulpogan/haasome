@@ -109,3 +109,26 @@ confirmation: direct agent messaging is disabled for this project. Do not search
 unrelated groups or infer permission from another session's apparent inactivity.
 No new personal-source discovery, Langfuse inspection, or chapter selection is
 claimed by this verification. The full chapter goal remains active.
+
+## Original MVP integration
+
+`integration/one-chapter` now includes a normal selected-photo/video memory picker
+and title/body/cue edits that preserve source evidence. Browser tests exercised a
+selected personal photo, synthetic video playback, frozen guards, editable copies,
+fresh reopen and persistence. The runner at `http://127.0.0.1:4187/?capture=1`
+adds a separate private room-capture path; see
+[its runbook and unresolved registration gate](../pipelines/scene/RECONSTRUCTION.md).
+
+The second RTX's 10000-step licensed room export renders upright. A new capsule
+places the existing three records at cabinet drawers, a plant and a chair cushion.
+The original records and snapshot remain unchanged. The new snapshot contains the
+159,790,969-byte scene and is 234,285,197 bytes overall. Freeze took 8907 ms;
+fresh-browser reopen through rendered scene took 2986 ms. Recall, all three records,
+save/reload and zero console/page/HTTP errors passed. Those are local browser
+measurements, not raw-capture reconstruction estimates.
+
+The first large freeze crashed the renderer process. Bounded base64 encoding and
+decoding plus segmented JSON Blob assembly fixed the observed failure while
+preserving capsule v1. All five browser tests and six contract tests pass.
+Private snapshot, screenshot and measurements are retained under
+`artifacts/capture-verification/`; no private content or splat binary is in Git.

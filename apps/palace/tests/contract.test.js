@@ -15,7 +15,7 @@ test('nested bundle assets resolve; ambiguous file names do not', () => {
   assert.equal(resolveAsset(new Map([['a/evidence.png','a'],['b/evidence.png','b']]),'evidence.png'),undefined);
 });
 
-import {freezeCapsule, unpackCapsule, validateCapsule} from '../src/capsule.js';
+import {freezeCapsule, unpackCapsule, validateCapsule, capsuleBlob} from '../src/capsule.js';
 test('portable capsule includes only references, preserves bytes, rejects missing assets', async () => {
   const p = fixture(); p.scene.provenance.kind = 'generated';
   const paths = new Map([[p.scene.asset,new Blob([new Uint8Array([0,1,254,255])])],['unused.txt',new Blob(['excluded'])]]);
@@ -33,6 +33,7 @@ test('portable capsule includes only references, preserves bytes, rejects missin
 test('base64 validation uses bounded stack for multi-megabyte assets and rejects malformed padding', async () => {
   const p=fixture(), bytes=Buffer.alloc(4*1024*1024,173);
   const c=await freezeCapsule(p,new Map([[p.scene.asset,new Blob([bytes])]]),'Large test');
+  assert.deepEqual(JSON.parse(await capsuleBlob(c).text()), c);
   assert.deepEqual(Buffer.from(await unpackCapsule(c).get(p.scene.asset).arrayBuffer()),bytes);
   for (const data of ['', 'AA==', 'AAA=', 'AAAA', '+/8=']) {
     c.assets[0].data=data; assert.doesNotThrow(()=>validateCapsule(c));

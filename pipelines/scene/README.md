@@ -1,5 +1,9 @@
 # Lane B: licensed sample room
 
+For selected room photos/video and the private trainer, see the
+[capture runner](RECONSTRUCTION.md). Raw registration remains a separate gate
+from the verified posed-data training and licensed sample below.
+
 For an authorized local Marble SPZ/PLY export, use the [Marble import runbook](MARBLE.md).
 It emits the same `scene.json` handoff with `kind: generated`; coordinator must
 land that provenance support in the viewer. The licensed fallback below is unchanged.

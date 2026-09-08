@@ -40,7 +40,28 @@ export function validateCapsule(value) {
 
 export function unpackCapsule(value) {
   validateCapsule(value);
-  return new Map(value.assets.map(a => [a.path, new Blob([Uint8Array.from(atob(a.data), c => c.charCodeAt(0))], {type:a.type})]));
+  return new Map(value.assets.map(a => {
+    const parts = [];
+    for (let offset=0; offset<a.data.length; offset+=65536) {
+      const binary = atob(a.data.slice(offset,offset+65536));
+      const bytes = new Uint8Array(binary.length);
+      for (let i=0; i<binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      parts.push(bytes);
+    }
+    return [a.path,new Blob(parts,{type:a.type})];
+  }));
+}
+
+// Base64 contains no JSON escapes. Build the download from bounded pieces rather
+// than duplicating every encoded scene in one giant JSON.stringify allocation.
+export function capsuleBlob(container) {
+  const parts = ['{"capsuleVersion":1,"palace":',JSON.stringify(container.palace),',"assets":['];
+  container.assets.forEach((asset,i) => {
+    if (i) parts.push(',');
+    parts.push('{"path":',JSON.stringify(asset.path),',"type":',JSON.stringify(asset.type),',"data":"',asset.data,'"}');
+  });
+  parts.push(']}');
+  return new Blob(parts,{type:'application/json'});
 }
 
 export async function freezeCapsule(palace, assets, title) {
@@ -51,10 +72,13 @@ export async function freezeCapsule(palace, assets, title) {
   for (const path of referencedAssets(snapshot)) {
     const blob = resolveAsset(assets,path);
     if (!blob) throw new Error(`Missing referenced asset: ${path}`);
-    const bytes = new Uint8Array(await blob.arrayBuffer());
-    let binary = '';
-    for (let i=0; i<bytes.length; i+=32768) binary += String.fromCharCode(...bytes.subarray(i,i+32768));
-    packed.push({path,type:blob.type || 'application/octet-stream',data:btoa(binary)});
+    const chunks = [];
+    // Multiple of three preserves base64 boundaries when chunks are joined.
+    for (let offset=0; offset<blob.size; offset+=49152) {
+      const bytes = new Uint8Array(await blob.slice(offset,offset+49152).arrayBuffer());
+      chunks.push(btoa(String.fromCharCode(...bytes)));
+    }
+    packed.push({path,type:blob.type || 'application/octet-stream',data:chunks.join('')});
   }
   return validateCapsule({capsuleVersion:1,palace:snapshot,assets:packed});
 }
