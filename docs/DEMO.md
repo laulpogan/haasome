@@ -60,7 +60,13 @@ The 1.7-minute automated test duration is not spoken presentation timing.
 
 1. Current release viewer with its prepared public bundle.
 2. Worker preview on port 4189 and its frozen museum capsule.
-3. A labeled recording or screenshots of the verified route if rendering fails.
+3. Local `artifacts/fallback/recording/automated-museum-walkthrough.mp4`: a
+   95-second silent automated walkthrough (5.6 MB), with initial loading trimmed.
+   Interaction timing and the freeze/reopen wait are retained. Tell the audience
+   this is recorded playback, not live computer use or a spoken rehearsal.
+   The reopened hand note and sampled video frames were inspected; page errors
+   were empty. This local video is ignored by Git and does not ship with a clone.
+   Screenshots under `artifacts/fallback/proof/` are another local backup.
 
 The Austin personal capsule and private offline timeline remain separate evidence
 of the original vision. They are not needed to run or distribute this public demo.
