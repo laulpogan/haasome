@@ -7,6 +7,7 @@ import { saveLocal, loadLocal } from './storage.js';
 import { decodeSelectedMedia } from './media.js';
 import { mountCapture } from './capture.js';
 import {readTour, verifyTourScene, regionAtPoint, projectRegion} from './curated.js';
+import {readyTour} from './catalog.js';
 import './style.css';
 
 const $ = (id) => document.getElementById(id);
@@ -369,15 +370,16 @@ try {
   if (stored) { palace = validatePalace(stored.palace); if (!frozen() && !readTour(palace)) completeAnchors(palace); assets = new Map(stored.assets); selected = palace.anchors[0].id; notice('Restored the saved palace and its local assets.'); }
 } catch (error) { notice(`Saved palace unavailable: ${error.message}. Reimport your bundle.`); }
 // The dedicated URL opens this public educational bundle without touching source apps.
-if (new URLSearchParams(location.search).get('tour') === 'capitoline') {
+const selectedTour = readyTour(new URLSearchParams(location.search).get('tour'));
+if (selectedTour) {
   try {
-    const response = await fetch('/curated-court/palace.json');
+    const response = await fetch(`${selectedTour.bundle}/palace.json`);
     if (!response.ok) throw new Error('Run the fallback preparation script to install the licensed bundle.');
     const draft = await response.json(); validatePalace(draft); readTour(draft);
     const paths = [draft.scene.asset,...new Set(draft.memories.map(m => m.source.evidenceAsset).filter(Boolean))];
     const files = [new File([JSON.stringify(draft)],'palace.json',{type:'application/json'})];
     for (const path of paths) {
-      assetPath(path); const asset = await fetch(`/curated-court/${path}`);
+      assetPath(path); const asset = await fetch(`${selectedTour.bundle}/${path}`);
       if (!asset.ok) throw new Error(`Missing exhibit asset: ${path}`);
       files.push(new File([await asset.blob()],path,{type:path.endsWith('.txt') ? 'text/plain' : 'application/octet-stream'}));
     }
