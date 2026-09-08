@@ -1,9 +1,16 @@
-# Palace contract v0 — proposed handoff
+# Palace contract v0 — file handoff
 
-No runtime consumes this contract yet. A implements the consumer; B produces `scene`;
-C produces entries in `memories`; A owns anchors and assembly into the palace file.
+The [viewer](../../apps/palace/src/main.js) consumes B's `scene` and C's `memories`
+through local file/folder import. A owns anchors and assembly into the palace file.
+The live integration has consumed a licensed room and an exporter-generated fixture;
+actual source-app capture remains unverified.
 Coordinator owns changes here. `examples/palace.fixture.json` is synthetic shape
 data with deliberately missing assets, not a usable scan or live capture.
+
+The consumer's [validator](../../apps/palace/src/contract.js) is executable shape
+validation. The viewer permits `scene: null` for a local empty draft, accepts one
+to five anchors, and fills missing anchors to five. A complete scene bundle still
+requires the fields below. Validation cannot establish source truth or capture.
 
 ## Wire format
 

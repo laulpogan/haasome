@@ -27,3 +27,17 @@ Keep a labeled recording for connectivity failure.
 
 Record observed values for scene bytes, cold load seconds, navigation responsiveness,
 capture duration, and total demo duration. Until exercised: `not_established`.
+
+## First integrated verification
+
+On 2026-09-08, the production build passed four contract tests and an isolated
+Playwright browser flow with zero console errors or failed HTTP responses. The
+browser consumed the scene pipeline's exact 14,955,740-byte SOG and the local memory
+exporter's fixture bundle. Image/evidence display, anchor editing, recall/reveal,
+save/reload, JSON round-trip, and invalid-path rejection passed. Desktop and mobile
+screenshots were inspected.
+
+One headless Metal run reported 0.74 seconds for local splat decode/load. This
+excludes network download and reconstruction and is not a sustained performance
+claim. Actual capture duration, presenter-room reconstruction, video playback,
+five meaningful object placements, and the full stage rehearsal remain unverified.

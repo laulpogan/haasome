@@ -9,7 +9,7 @@ and cue → visit → reveal. Browser files stay local; no API or source-app acc
 Requires Node 20.19+ or 22.12+ (verified with Node 26.7.0).
 
 ```sh
-cd /Users/laul_pogan/Source/haasome-experience/apps/palace
+cd apps/palace # from repository root
 npm ci
 npm run build
 npm run preview
@@ -60,14 +60,15 @@ source locators render as text, never HTML or executable links.
 npm run check
 npm run build
 # Run while preview is serving port 4173:
-PALACE_SCENE_BUNDLE=/Users/laul_pogan/Source/haasome-scene/artifacts/scene/table-tennis-room \
-PALACE_MEMORY_BUNDLE=/Users/laul_pogan/Source/haasome-memory/artifacts/memories/fixture-first \
+PALACE_SCENE_BUNDLE="$(pwd)/../../artifacts/scene/table-tennis-room" \
+PALACE_MEMORY_BUNDLE="$(pwd)/../../artifacts/memories/fixture-first" \
 npm run test:browser
 ```
 
 Playwright launches its own headless Chromium with Metal on macOS, never native
-Chrome or a user profile. Install Playwright's Chromium if absent. On other systems,
-remove the Metal launch argument in playwright.config.js. Without bundle variables,
+Chrome or a user profile. Install Playwright's Chromium if absent. Other systems
+use Chromium's default rendering backend. Set `PALACE_BASE_URL` to test a preview
+on a different local port. Without bundle variables,
 the test checks the missing-scene fixture flow; it does not establish real rendering.
 
 Observed: B's exact 1,244,410-splat SOG rendered the table, walls, signage, and windows;

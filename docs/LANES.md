@@ -1,22 +1,25 @@
 # Three lanes / seven hours
 
 The coordinator owns integration and shared files. Teammates claim A, B, or C.
-Codex workers now occupy A, B, and C in isolated worktrees. Human teammates should
-coordinate before taking the same write scope. Two read-only scouts support asset
-licensing and GPU readiness; they do not create additional product lanes.
+The first Codex wave completed A, B, and the C exporter in isolated worktrees.
+Results are assembled on `integration/first-palace`; those bounded workers have
+stopped. Human teammates can claim the next handoffs in README.md from that branch.
+Two completed read-only scouts covered asset licensing and GPU readiness; they
+did not create additional product lanes.
 
 Prefer ChatGPT Web High for bounded Codex tasks to conserve Astra credits. The
 initial read-only scouts completed, but writer tool calls failed with expired
-tokens / bridge 502s. Two bounded Astra workers at medium reasoning now handle A
-and B; coordinator handles the small C exporter. No worker may recursively spawn
+tokens / bridge 502s. Two bounded Astra workers at medium reasoning handled A
+and B; coordinator handled the small C exporter. No worker may recursively spawn
 more workers or start paid API jobs. Recheck healthy low-cost routing before
 expanding the pool; failed worker launches do not count as implementation progress.
 
 ## A — Spatial experience
 
 Own `apps/palace/`. Build the browser viewer, navigation, cards, import, persistence,
-and recall interaction. Choose and pin the renderer after opening its current
-source, license, release, and example. Spark / Three.js is a candidate, not installed.
+and recall interaction. The first slice pins Spark 2.1.0 and Three.js 0.185.1 after
+source/license checks. Keep those versions through the demo unless a blocking defect
+requires a change. The milestones below describe the original seven-hour allocation.
 
 First 30 minutes: render a genuine splat and show one clickable anchor from fixture
 data. Use an explicit placeholder state if B's scene is missing; do not fake a scan.

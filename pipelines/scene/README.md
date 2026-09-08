@@ -3,7 +3,7 @@
 Fetch and package the selected Table Tennis Room with Python 3's standard library:
 
 ```sh
-cd /Users/laul_pogan/Source/haasome-scene
+# From repository root:
 python3 pipelines/scene/fetch_sample.py
 ```
 
@@ -13,7 +13,7 @@ package installation, account, or paid API is used. Network reads have a 30-seco
 timeout per resource. Any size/hash mismatch aborts before publishing the asset.
 
 Output bundle root:
-`/Users/laul_pogan/Source/haasome-scene/artifacts/scene/table-tennis-room/`
+`artifacts/scene/table-tennis-room/` under the current repository checkout.
 
 - `table-tennis-room.sog`: ZIP with `meta.json` and five WebP payloads at its root.
 - `scene.json`: producer's scene object, using contract v0 plus `schemaVersion: 0`.
