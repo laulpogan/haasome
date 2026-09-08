@@ -1,6 +1,15 @@
 # Lane C: native WhatsApp computer-use trial
 
-## Outcome
+## Latest expanded delivery
+
+Use `services/memory/bundles/austin-trip/`: four English cards, three original
+photos and one short MP4. It includes the original corner-kick record unchanged.
+The new media were exported through WhatsApp UI; their records conservatively use
+`manual` packaging because no new context screenshot was successfully saved.
+See the bundle README for provenance, import instructions and remaining checks.
+Do not import both versions together.
+
+## Original capture outcome
 
 The agent browsed a presenter-selected travel group in WhatsApp for Mac, inspected
 its media gallery, opened selected photos and read their captions and message

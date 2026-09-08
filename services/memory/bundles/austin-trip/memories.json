@@ -1,0 +1,82 @@
+[
+  {
+    "id": "memory-235c032afd18495d9a1f49823c3b047f",
+    "title": "A smile before the corner kick",
+    "body": "I shared a match photo in our Austin soccer trip group and joked that Martin was smiling even as he was about to head the ball from a corner kick. This detail comes from my caption, not face recognition.",
+    "cue": "What made me laugh about the corner-kick photo?",
+    "media": [
+      {
+        "kind": "image",
+        "asset": "assets/memory-235c032afd18495d9a1f49823c3b047f/media-0.jpg",
+        "alt": "A smile before the corner kick"
+      }
+    ],
+    "source": {
+      "kind": "computer-use",
+      "app": "WhatsApp for Mac",
+      "locator": "Austin Soccer Trek 2026 > photo sent by You on February 22, 2026 at 5:12 PM (displayed message time); gallery item 139/171 at inspection",
+      "capturedAt": "2026-09-08T19:24:00Z",
+      "evidenceAsset": "assets/memory-235c032afd18495d9a1f49823c3b047f/evidence.jpg"
+    }
+  },
+  {
+    "id": "memory-ff1c765d72fc47388946a85e39e92ec5",
+    "title": "Together on the soccer field",
+    "body": "A group photo shared by Frank shows players posing together on a soccer field in Cal and Berkeley jerseys. The message was shared in the Austin trip group; its timestamp does not establish when the photo was taken.",
+    "cue": "What did the team photo on the field look like?",
+    "media": [
+      {
+        "kind": "image",
+        "asset": "assets/memory-ff1c765d72fc47388946a85e39e92ec5/media-0.jpg",
+        "alt": "Together on the soccer field"
+      }
+    ],
+    "source": {
+      "kind": "manual",
+      "app": "WhatsApp for Mac",
+      "locator": "Austin Soccer Trek 2026 > Frank Berkeley Haas; February 23, 2026 at 9:08 AM; gallery item 147/171 (displayed message time)",
+      "capturedAt": "2026-09-08T19:41:00Z",
+      "evidenceAsset": null
+    }
+  },
+  {
+    "id": "memory-96fea803d98249ad9acc583d18051cff",
+    "title": "A fourth game on day one",
+    "body": "Adeline captioned this photo: \"Day 1 - When they tell you you have to play a fourth game…\" The joke supplies the context; this record does not independently verify the number of games played.",
+    "cue": "What was the joke about day one?",
+    "media": [
+      {
+        "kind": "image",
+        "asset": "assets/memory-96fea803d98249ad9acc583d18051cff/media-0.jpg",
+        "alt": "A fourth game on day one"
+      }
+    ],
+    "source": {
+      "kind": "manual",
+      "app": "WhatsApp for Mac",
+      "locator": "Austin Soccer Trek 2026 > Adeline Lalor Berkeley Haas; February 22, 2026 at 7:20 PM; gallery item 143/171 (displayed message time)",
+      "capturedAt": "2026-09-08T19:45:00Z",
+      "evidenceAsset": null
+    }
+  },
+  {
+    "id": "memory-55213a15894b4d2fbc778267e92b46df",
+    "title": "Table tennis: the final games and award",
+    "body": "Kamal shared a short video captioned \"The final games and award\". The inspected footage shows people gathered around a blue table-tennis table indoors. No winner or participant identity is inferred.",
+    "cue": "What other game brought people together during the trip?",
+    "media": [
+      {
+        "kind": "video",
+        "asset": "assets/memory-55213a15894b4d2fbc778267e92b46df/media-0.mp4",
+        "alt": "Table tennis: the final games and award"
+      }
+    ],
+    "source": {
+      "kind": "manual",
+      "app": "WhatsApp for Mac",
+      "locator": "Austin Soccer Trek 2026 > Kamal Berkeley Haas; February 22, 2026 at 5:01 PM; gallery item 121/171 (displayed message time)",
+      "capturedAt": "2026-09-08T19:40:00Z",
+      "evidenceAsset": null
+    }
+  }
+]
