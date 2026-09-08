@@ -1,43 +1,59 @@
-# Demo and acceptance
+# Main demo: Fragments of an Emperor
 
-## Proposed 90-second story: Remember the fix
+Use `release/museum-demo`. Start at `http://127.0.0.1:4193/?tour=capitoline` after
+the README setup. The worker's existing port 4189 remains a tested local backup.
+Preload the courtyard and wait until the actual scene appears; decode-ready text
+can precede the first sorted GPU frame.
 
-1. 0–15s: pose one technical problem and enter the licensed room.
-2. 15–35s: show a labeled excerpt of a completed agent UI capture and its finding.
-3. 35–65s: walk five loci: prerequisite, symptom, cause, correction, verification.
-4. 65–90s: hide the cards, recall the consequential detail, and reveal its source.
+## Proposed 90-second route
 
-These are presentation allocations, not execution-speed claims. Capture and verify
-the technical lesson before the stage demo. If only manual content exists, label
-the demonstration as a spatial lesson; do not substitute fixtures for agent proof.
+1. Courtyard: explain that knowledge can be attached to a place.
+2. Select the head: show its saved museum note and source link.
+3. Select the hand: introduce the distinction between artifact and restoration.
+4. Select the foot: show the third object and its note.
+5. Begin recall on the hand. Its detail stays hidden until the hand surface is visited.
+6. Click the visible hand, reveal the saved detail, then end recall.
+7. Reopen the prepared frozen capsule and revisit the same object.
 
-The sample room is precomputed. Do not claim reconstruction or a personal home.
-Keep a labeled recording for connectivity failure.
+Suggested narration, pending spoken rehearsal:
 
-## Acceptance checks on the presentation laptop
+> Haasome gives knowledge a place. This is a licensed scan of a museum courtyard.
+> We attached three source-backed notes to the objects you can see.
+>
+> Start with the head: it gives us an identity. Move to the hand: its note separates
+> the surviving artifact from a later restoration. The foot gives us a third cue.
+> Each object keeps its museum source beside the explanation.
+>
+> Now hide the hand's detail. Visit its surface, then reveal what the saved note
+> says. The place becomes a way back to the information.
+>
+> Freeze the chapter and reopen it: the scene and notes travel together. These
+> regions are curated. Our broader vision brings the same interaction to familiar
+> rooms and selected personal memories. Haasome: a place to remember.
 
-- Real scene asset decodes and renders; sample/private-capture label is accurate.
-- Five anchors remain attached to the same loci after navigation and reload.
-- One memory was captured by actual computer use, not a hand-authored fixture.
-- Source reveal shows the matching screenshot/locator and capture time.
-- New memory import, placement, save, and reload run through the viewer UI.
-- Missing scene/media produces an explicit recoverable state.
-- Recall hides content until reveal; no claim of measured cognitive improvement.
-- No console errors or failed required assets during a complete rehearsal.
+Do not call this automatic recognition or claim measured improvement in memory.
+The modern scan is not a reconstruction of ancient Rome. Keep CC BY attribution
+visible. The museum catalogs are sources, not endorsement of this app.
 
-Record observed values for scene bytes, cold load seconds, navigation responsiveness,
-capture duration, and total demo duration. Until exercised: `not_established`.
+## Rehearsal checks
 
-## First integrated verification
+Use the exact release build and capsule. Visit all three surfaces; reveal each
+matching note. Test background misses, recall/reveal, freeze, fresh browser import,
+and device save/reload. Inspect the settled image and browser errors. Run the
+spoken route twice and record actual duration; automated action timings are not
+spoken timing. The collaborator owns that report in GitHub issue #1.
 
-On 2026-09-08, the production build passed four contract tests and an isolated
-Playwright browser flow with zero console errors or failed HTTP responses. The
-browser consumed the scene pipeline's exact 14,955,740-byte SOG and the local memory
-exporter's fixture bundle. Image/evidence display, anchor editing, recall/reveal,
-save/reload, JSON round-trip, and invalid-path rejection passed. Desktop and mobile
-screenshots were inspected.
+Worker verification at affeb0f covers three real surface clicks, recall, freeze,
+fresh-process reopen without original bundle requests and identical capsule
+re-download. Coordinator also verified device reload and inspected the settled
+courtyard. Full source, asset hashes and evidence paths: [museum handoff](FALLBACK-DEMO.md).
 
-One headless Metal run reported 0.74 seconds for local splat decode/load. This
-excludes network download and reconstruction and is not a sustained performance
-claim. Actual capture duration, presenter-room reconstruction, video playback,
-five meaningful object placements, and the full stage rehearsal remain unverified.
+## Fallback order
+
+1. Current release viewer with its prepared public bundle.
+2. Worker preview on port 4189 and its frozen museum capsule.
+3. A labeled recording or screenshots of the verified route if rendering fails.
+
+The Austin personal capsule and private offline timeline remain separate evidence
+of the original vision. They are not needed to run or distribute this public demo.
+Do not upload private Austin assets when sharing the museum release.

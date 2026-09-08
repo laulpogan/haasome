@@ -1,69 +1,68 @@
-# Haasome — Memory Palace
+# Haasome — give knowledge a place
 
-Turn a familiar room into a place to revisit memories and recall useful knowledge.
-Seven-hour Codex Astra 6 hackathon build: one Gaussian-splat room, five spatial
-anchors, selected photos/video, and one observed computer-use capture from an app.
+**Presentation branch: `release/museum-demo`.** Explore a real Gaussian splat of
+the Capitoline courtyard, visit three marble artifacts, and recall a museum-backed
+detail through its object. Freeze the chapter and reopen it with its scene and notes.
 
-**MVP verified on `integration/one-chapter`.** A presenter-selected 17-second video
-became a real room splat in 87 seconds on the prepared trainer, including upload
-and return. Five source-backed cards, three photos and two playable videos form
-a portable capsule. Freeze, fresh reopen, recall, edits and save/reload passed.
-The room is recognizable but rough around moving people and poorly covered areas.
-See [measured reconstruction results](pipelines/scene/RECONSTRUCTION.md) and
-[capsule evidence](docs/CAPSULE-PLAN.md). The original licensed room remains available.
+The presenter chose this route after reviewing the personal-room reconstruction.
+The museum scan is licensed CC BY 4.0; regions and notes are manually curated.
+No automatic recognition, historic-scene reconstruction or measured learning gain
+is claimed. See [attribution and verification](docs/FALLBACK-DEMO.md).
 
-## Run the first slice
+## Run
 
-From repository root on `integration/one-chapter`:
+From this branch's repository root:
 
 ```sh
-python3 pipelines/scene/fetch_sample.py
 cd apps/palace
-npm ci
+npm ci --ignore-scripts
+python3 scripts/prepare-fallback.py
 npm run build
-npm run preview
+npm run preview -- --port 4193
 ```
 
-Open `http://127.0.0.1:4173`. Choose **Open bundle** and select
-`artifacts/scene/table-tennis-room` from the repository root. The fetch command
-refuses to overwrite an existing bundle; reuse it if already present. Select a
-place, then import an [exported memory bundle](services/memory/README.md).
-See [viewer instructions](apps/palace/README.md) for checks and persistence limits.
-To reconstruct selected room media, use the [private capture runner](pipelines/scene/RECONSTRUCTION.md).
-To reopen the completed demo, use **Import files** with its frozen capsule JSON.
-Selected personal artifacts stay outside this integration branch's tracked files.
+Open **http://127.0.0.1:4193/?tour=capitoline**. The preparation script fetches and
+verifies the licensed 72 MB scene; GPU training and credentials are not needed.
+The tour URL starts a new public draft. Use the base URL without the query to
+restore device storage or import a frozen capsule.
 
-## Start here
+The presentation Mac also has the original verified worker preview at
+**http://127.0.0.1:4189/?tour=capitoline**. Localhost addresses work only on the
+computer running the server. Remote teammates can follow the commands above.
 
-1. Read [the brief](PROJECT.md) and [three-lane plan](docs/LANES.md).
-2. Claim one lane with teammates before writing. Each lane gets its own clone or worktree.
-3. Read [the shared contract](packages/contracts/README.md).
-4. Continue from the integrated slice; finish the remaining live handoff before adding features.
+## Demo
 
-| Lane | Owns | Next handoff |
-| --- | --- | --- |
-| A — Spatial experience | `apps/palace/` | Rehearse the verified capsule; fix observed interaction issues |
-| B — Scene pipeline | `pipelines/scene/` | Assess capture quality; preserve the working scene |
-| C — App intelligence | `services/memory/` | Curate selected cards using the existing assembler |
+Head → hand → foot → recall the hand's detail → revisit its surface → reveal source.
+Use **Freeze capsule** to download the portable chapter; **Import files** reopens
+it in a fresh viewer. **Save on this device** stores only in the current browser.
+The app is still required to render a downloaded capsule.
 
-Shared contracts, root configuration, and integration belong to the coordinator.
-See [AGENTS.md](AGENTS.md) for write boundaries and Git rules.
-The [teammate prompts](docs/TEAMMATE-START.md) include a low-touch content lane.
+See [the current runbook](docs/DEMO.md). The three artifacts have actual surface
+picking, source notes and guided close views. Free navigation can expose scan gaps;
+use the verified stops for the presentation. Source websites require internet,
+but saved notes and scene travel inside the capsule.
 
-```sh
-git fetch origin
-# Choose your lane and replace yourname with a unique teammate name.
-git worktree add ../haasome-next-experience -b work/experience-yourname origin/integration/one-chapter
-git worktree add ../haasome-next-scene -b work/scene-yourname origin/integration/one-chapter
-git worktree add ../haasome-next-memory -b work/memory-yourname origin/integration/one-chapter
-```
+## Next: a gallery of splat experiences
 
-GitHub selected `setup/memory-palace` as the initial default branch when this empty
-repository received its first push. The latest assembled code is on
-`integration/one-chapter`; the initial `lane/*` branches preserve each producer's
-commit. Continue from integration in a fresh owned branch. Merge to default only
-when requested; nothing has been merged there.
+Read [the gallery handoff](docs/GALLERY-HANDOFF.md) for ready/candidate labels,
+similar concepts, beginner-friendly prompts and file ownership. Constantine is the
+first ready entry; the gallery and additional tours are the next work, not shipped
+capabilities.
 
-No raw personal media, screenshots, room scans, credentials, or model weights in
-Git. Use ignored `data/` and `artifacts/`. Fixture files are synthetic and explicitly
-labeled. [Delivery gates](docs/DEMO.md) distinguish live execution from replay.
+## Collaboration and preserved work
+
+- Coordinator owns this release branch and presentation fixes.
+- sbardacosta-code owns narration and first-time rehearsal feedback in
+  [issue #1](https://github.com/laulpogan/haasome/issues/1).
+- [Issue #2](https://github.com/laulpogan/haasome/issues/2) tracks technical handoffs.
+- `integration/demo-polish` preserves native-resolution room training and manual
+  geometry bindings with the Austin memories. Recognition remains unfinished there.
+- `integration/one-chapter` preserves the original personal-capture MVP.
+
+The personal vision remains: selected app context and photos become memories in a
+familiar place. The prepared trainer reconstructed the selected short room clip,
+but its moving subjects and limited coverage left the scene too rough for the
+main demo. Keep that evidence separate from this licensed museum route.
+
+Work in owned branches; do not merge default without instruction. Keep private
+media, credentials, model weights and large scene artifacts outside Git.

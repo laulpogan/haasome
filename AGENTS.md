@@ -19,8 +19,10 @@ Read `PROJECT.md`, `docs/LANES.md`, and `packages/contracts/README.md` first.
 - Keep private media and machine inventories out of Git. `.env.op` holds references
   only; never literal secrets. Dependencies and source assets need license checks.
 - Remote GPU access does not authorize stopping other jobs or changing drivers.
-- Scope: one real scene, five anchors, one source app, one revisit/recall loop.
+- Current release scope: one licensed museum scene, three curated object regions,
+  source-backed notes and one revisit/recall loop. Personal lanes remain separate.
   No distributed trainer, generic agent platform, account system, or headset work.
 
-Done requires the real viewer to consume B's exported scene and C's captured memory.
-If only a fixture is connected, report that boundary in the demo and handoff.
+Release done requires the real viewer to consume the licensed museum scene and
+curated notes, with surface selection, recall and portable reopen observed.
+Preserve the original personal-capture evidence on its integration branches.

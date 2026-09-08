@@ -1,3 +1,6 @@
+> Historical allocation. The current museum release and active ownership are in
+> [README](../README.md) and [teammate handoff](TEAMMATE-START.md).
+
 # Three lanes / seven hours
 
 The coordinator owns integration and shared files. Teammates claim A, B, or C.

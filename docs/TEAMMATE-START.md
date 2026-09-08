@@ -1,43 +1,26 @@
-# Teammate goals
+# Current collaborator: demo rehearsal
 
-Start from `origin/integration/one-chapter` in a separate worktree and feature
-branch. The MVP is integrated; preserve the working path. Never switch another
-session's checkout or merge the default branch.
+sbardacosta-code owns [GitHub issue #1](https://github.com/laulpogan/haasome/issues/1).
+The main route is now the museum on `release/museum-demo`, not the Austin room.
+Follow README to run it on your own computer; no GPU or private capsule is needed.
 
-## Newer programmer: selected memory content
+Deliver a proposed 90-second script and up to three observed usability problems.
+Aim for about 140 spoken words. Once you have access, run the route twice and
+report actual duration, clicks and failures. Do not call a script review a live
+rehearsal. The coordinator fixes code.
 
-Paste this into Codex in your own checkout:
+Copy-paste prompt:
 
 ```text
-Read AGENTS.md, PROJECT.md, packages/contracts/README.md and services/memory/README.md.
-Own services/memory/ only. Reuse export_memory.py and assemble_capsule.py; do not
-build another exporter, backend or renderer. Explain progress in plain language.
-
-Goal: prepare three to five presenter-selected memory cards and assemble them with
-an existing scene. Start from the approved bundle supplied by the coordinator.
-Preserve media, source dates and evidence. Keep observed facts separate from
-presenter interpretation. Never turn a manual record into computer-use evidence.
-Help the presenter improve titles and recall cues without inventing biography.
-
-Run the existing assembler into a new ignored artifacts/ folder. Open that exact
-bundle in the viewer, visit every card, play included videos, freeze, reopen and
-recall. Originals must remain unchanged. If an input is missing, report its exact
-path. Do not install GPU software, edit apps/palace/, or browse unrelated records.
-Push verified code/documentation changes only. Return the output folder, screenshot
-and observed result. Keep personal assets outside Git unless separately approved.
+Help me rehearse Haasome's Fragments of an Emperor demo as a beginner. Start from
+origin/release/museum-demo in an owned checkout and follow README. No GPU setup.
+Read docs/DEMO.md and GitHub issue #1. Guide me through the head, hand and foot,
+then recall/reveal and frozen reopen. Draft a short script; ask what I observed,
+and never invent test results. Own only docs/DEMO-REHEARSAL.md if a file is needed.
+Post the script, actual timings if run, and three prioritized findings to issue #1.
+Do not edit app code, collect private media, install models or merge branches.
 ```
 
-## Experienced frontend teammate
-
-Own `apps/palace/`. Rehearse the selected capsule and fix observed interaction
-defects. Preserve the file contract, frozen originals, video playback and large
-asset support. Verify the running build before pushing. No renderer replacement.
-
-## Coordinator
-
-Own `pipelines/scene/`, shared contracts, root docs and integration. Preserve the
-verified 87-second room reconstruction and the higher-quality licensed fallback.
-Use a short probe before further training. Distinguish UI actions from shell work,
-and keep stage timings separate from cold setup. Integrate reviewed commits without
-rewriting teammates' branches. Independent work may use Codex children; do not
-spawn workers for work that is already complete.
+Technical integration and presentation fixes belong to the coordinator. Personal
+quality, object-memory and collection lanes retain their existing branches and
+ownership; they do not overwrite this release branch.
