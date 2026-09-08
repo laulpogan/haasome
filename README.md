@@ -7,8 +7,9 @@ anchors, selected photos/video, and one observed computer-use capture from an ap
 **Status: first runnable slice on `integration/first-palace`.** The browser renders
 a licensed real room and imports local memory/media bundles, with placement,
 recall/reveal, and save/reload. App capture remains fixture-only; no personal room
-has been reconstructed. Two [Pro rounds](docs/PRO-IDEAS.md) selected **Remember the
-fix**, a public technical lesson, as the first demo story.
+has been reconstructed. Active pivot: operate Nerfstudio's reconstruction UI on a
+remote RTX host, export a fresh scene, and remember that workflow in the palace.
+The earlier [Pro rounds](docs/PRO-IDEAS.md) remain idea context.
 
 ## Run the first slice
 
@@ -35,11 +36,14 @@ See [viewer instructions](apps/palace/README.md) for checks and persistence limi
 3. Read [the shared contract](packages/contracts/README.md).
 4. Continue from the integrated slice; finish the remaining live handoff before adding features.
 
+**New teammate:** use the [copy-paste goal prompts](docs/TEAMMATE-START.md).
+The five-card memory pack is the bounded lane for someone newer to programming.
+
 | Lane | Owns | Next handoff |
 | --- | --- | --- |
 | A — Spatial experience | `apps/palace/` | Place five loci on recognizable objects and rehearse |
-| B — Scene pipeline | `pipelines/scene/` | Presenter-selected room capture when available |
-| C — App intelligence | `services/memory/` | One actual public-source UI capture imported in viewer |
+| B — Scene pipeline | `pipelines/scene/` | Coordinator: remote train, actual UI operation, fresh export |
+| C — App intelligence | `services/memory/` | Teammate: five-card batch pack, then attach coordinator's UI evidence |
 
 Shared contracts, root configuration, and integration belong to the coordinator.
 See [AGENTS.md](AGENTS.md) for write boundaries and Git rules.

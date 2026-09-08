@@ -17,9 +17,8 @@
 5. Review only those selected clips for blur, glare, missing sides and private
    content. Retake gaps now. Save originals under ignored `artifacts/scene/` or an
    approved private location. Preserve originals; extract frames into a new folder.
-6. Hand off capture only until a compatible reconstruction stack is confirmed.
-   No trainer installation or GPU execution belongs to this bounded slice. A later
-   authorized run must inspect capacity (`nvidia-smi`, or `gpu-status` on GB10),
+6. Trainer installation and GPU execution are now authorized for the reconstruction
+   UI demo. Inspect capacity (`nvidia-smi`, or `gpu-status` on GB10),
    architecture and existing tools without stopping jobs or changing drivers.
    Confirm camera registration, then benchmark the exact configuration for 5–10
    training steps before a longer run. Do not assume an Astra API exists.
