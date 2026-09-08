@@ -1,17 +1,31 @@
-# Apple Maps local prototype
+# Haasome — Austin, remembered
 
-Native macOS viewer using AppKit and Apple's MapKit satellite Flyover. This is a local prototype, not an embeddable web map. It needs an internet connection for Apple map imagery; no private media is uploaded by this app.
+A local macOS memory palace built with AppKit, Apple MapKit Flyover and AVKit. Return to the actual Austin field, revisit three selected memories, and save your own words and spatial cues on your Mac. Apple supplies the map imagery; this app does not train a Gaussian splat or upload the selected media.
 
-Build with `zsh build.sh`. Launch with `zsh run.sh --media /path/to/selected/austin/media`. The media directory must contain the selected `memory-0.jpg` photo. Optional `--latitude` and `--longitude` set the map's initial location and memory cue. The defaults are the exported field photo's GPS, not a claim about the goal's exact position.
+## Open the private demo
 
-Apple supplies the map data and attribution. Native map controls support camera movement, rotation, tilt and zoom. The gold annotation shows the selected memory. The footer reports map loading errors. The initial camera is 500 meters from its target, tilted 60 degrees. The scale is hidden because the native control displayed a stale value during the first test.
+Double-click the prepared **Haasome Apple.app**. A prepared private copy contains its selected media in `Contents/Resources/Austin/`. The source repository does not include these personal files.
 
-## Observed on the presentation Mac, September 8, 2026
+For development, run `zsh build.sh`, then `zsh run.sh --media /path/to/selected/austin/media`. The folder needs `memory-0.jpg` (Martín’s goal), `memory-4.mp4` (the save against MIT), and `memory-1.jpg` (the team). The build requires the macOS command line tools and uses only Apple system frameworks.
 
-The native viewer loaded Apple's photorealistic Wright Fields imagery with surrounding buildings and trees in relief. Zoom changed the view, selecting the gold marker expanded its title, and the selected goal photo appeared alongside the field. Window sizing was corrected after the image's intrinsic size initially expanded the layout. Build and ad-hoc signing passed.
+## Revisit loop
 
-This is a one-memory local native prototype. It is not a browser embed or a trained Gaussian splat, and does not yet implement editable placement or saved multi-memory palaces. The initial marker uses the selected field photo's location; it does not establish the goal's exact position. Rendering may take a few seconds to settle. Reopen via the launch command with the same selected media folder.
+- Choose a gold map pin or a bottom memory card to open its photo or playable video.
+- **Explore the field** hides the story and media. Explore the real 3D place, then return through a pin or card.
+- Add **Your words** and press **Save your words**.
+- Move the map to the desired cue location and press **Place memory here** to save that memory at the map center.
+- **Orbit the field** toggles a slow, real camera orbit; **Reset view** returns to the starting camera. The map also supports normal zoom, rotation and tilt.
 
-Optional `--diagnostics /path/to/local/layout.json` writes camera and window geometry to that local file for troubleshooting. Keep this output outside Git along with the selected media.
+Saved notes and coordinates are stored as local JSON in `~/Library/Application Support/Haasome/palace-state.json`. Optional `--state /path/to/local/palace-state.json` overrides that location. Note drafts survive switching cards during the session; Save or Place writes the current palace to disk. Unsaved drafts are not promised to survive quitting.
 
-The build output stays in ignored `build/`; private media remains outside this directory. No external packages, API keys or account credentials are included.
+The initial camera uses the selected field photo’s GPS. The three initial anchor coordinates are approximate mnemonic placements, not verified locations of the goal, save or team photo. The user can correct their own cue positions. Reopening with the same state file restores saved notes and positions.
+
+## Verification and boundaries
+
+The earlier one-memory prototype was tested on the presentation Mac on September 8, 2026: Apple’s photorealistic Wright Fields loaded with buildings and trees in relief, zoom changed the view, pin selection worked, and the selected goal photo appeared. Window fitting was corrected; native scale is hidden because it initially displayed a stale value.
+
+The three-memory MVP was then verified on the presentation Mac: all three memory cards opened; the match video played through its 7.8-second timeline; Explore hid the memory and selecting a map point revealed it again; orbit changed the actual camera view; a test note and changed anchor coordinate were written to local JSON; after quitting and reopening, the saved note and location were restored. This verification used a separate local state file, leaving the presentation state clean. Rendering can take several seconds to settle. Apple map attribution remains in the native view.
+
+This is a local native app, not a browser embed, hosted product, automatic reconstruction pipeline or claim of measured memory improvement. It requires network access for Apple imagery. Its private media and saved palace remain local. No API key, paid API integration or external package is included.
+
+Optional `--latitude` and `--longitude` override the starting field coordinate. Optional `--diagnostics /path/to/local/layout.json` writes camera/window geometry for troubleshooting. Keep diagnostics and state outside Git. Build output remains in ignored `build/`.
