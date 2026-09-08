@@ -7,6 +7,19 @@ export function referencedAssets(palace) {
   ])];
 }
 
+function validBase64(data) {
+  if (typeof data !== 'string' || data.length % 4 !== 0) return false;
+  const end = data.length - (data.endsWith('==') ? 2 : data.endsWith('=') ? 1 : 0);
+  // Scan once with constant stack space; grouped regex repetition can overflow
+  // the browser's regex stack on ordinary scene and photo payloads.
+  for (let i = 0; i < end; i++) {
+    const c = data.charCodeAt(i);
+    if (!((c >= 65 && c <= 90) || (c >= 97 && c <= 122) ||
+      (c >= 48 && c <= 57) || c === 43 || c === 47)) return false;
+  }
+  return true;
+}
+
 export function validateCapsule(value) {
   if (value?.capsuleVersion !== 1) throw new Error('Expected capsuleVersion 1.');
   validatePalace(value.palace);
@@ -18,7 +31,7 @@ export function validateCapsule(value) {
     if (!required.has(asset.path)) throw new Error(`Unreferenced asset: ${asset.path}`);
     if (typeof asset.type !== 'string' || (asset.type && !/^[\w.+-]+\/[\w.+-]+$/.test(asset.type))) throw new Error('Invalid asset MIME type.');
     // Base64 is a wire encoding, not a content or provenance check.
-    if (typeof asset.data !== 'string' || !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(asset.data)) throw new Error('Invalid asset base64.');
+    if (!validBase64(asset.data)) throw new Error('Invalid asset base64.');
     seen.add(asset.path);
   }
   for (const path of required) if (!seen.has(path)) throw new Error(`Missing referenced asset: ${path}`);

@@ -99,3 +99,51 @@ test('portable scene bytes render after reopen; generated setting is labeled',as
   await reopened.screenshot({path:info.outputPath('portable-synthetic-scene.png')});
   expect(errors).toEqual([]);await context.close();
 });
+
+test('multi-megabyte image and optional real SOG survive freeze and fresh-browser decode',async({page,browser},info)=>{
+  const errors=[],failed=[];
+  const watch=p=>{p.on('pageerror',e=>errors.push(e.message));p.on('console',m=>{if(m.type()==='error')errors.push(m.text());});p.on('response',r=>{if(r.status()>=400)failed.push(r.url());});};
+  watch(page);await page.goto('/');
+  // Generate a large, valid PNG inside the isolated test browser; no private photo.
+  const base64=await page.evaluate(()=>{
+    const canvas=document.createElement('canvas');canvas.width=canvas.height=1024;
+    const ctx=canvas.getContext('2d'), pixels=ctx.createImageData(1024,1024);
+    let seed=7;
+    for(let i=0;i<pixels.data.length;i+=4){
+      for(let j=0;j<3;j++){seed=(Math.imul(seed,1664525)+1013904223)>>>0;pixels.data[i+j]=seed>>>24;}
+      pixels.data[i+3]=255;
+    }
+    ctx.putImageData(pixels,0,0);return canvas.toDataURL('image/png').split(',')[1];
+  });
+  const photo=Buffer.from(base64,'base64');expect(photo.length).toBeGreaterThan(3*1024*1024);
+  const p=draft();p.memories=p.memories.slice(0,1);p.anchors[0].memoryIds=['m0'];
+  p.memories[0].media[0].asset='large.png';p.memories[0].source.evidenceAsset='large.png';
+  const expected=new Map([['large.png',photo]]);
+  if(process.env.PALACE_SCENE_BUNDLE){
+    p.scene=JSON.parse(readFileSync(`${process.env.PALACE_SCENE_BUNDLE}/scene.json`,'utf8'));
+    expected.set(p.scene.asset,readFileSync(`${process.env.PALACE_SCENE_BUNDLE}/${p.scene.asset}`));
+  }
+  await page.locator('#file-input').setInputFiles([jsonFile(p),...Array.from(expected,([name,buffer])=>({name,mimeType:name==='large.png'?'image/png':'application/octet-stream',buffer}))]);
+  if(p.scene)await expect(page.locator('#render-status')).toContainText('Gaussian splats loaded',{timeout:90000});
+  await expect.poll(()=>page.locator('#card img').evaluateAll(imgs=>imgs.length===2&&imgs.every(i=>i.naturalWidth===1024))).toBe(true);
+  const pending=page.waitForEvent('download');await page.locator('#freeze').click();
+  const container=JSON.parse(readFileSync(await(await pending).path(),'utf8'));
+  for(const asset of container.assets)expect(Buffer.from(asset.data,'base64').equals(expected.get(asset.path))).toBe(true);
+  await page.close();
+  const context=await browser.newContext(),reopened=await context.newPage();watch(reopened);
+  try{
+    await reopened.goto('/');await reopened.locator('#file-input').setInputFiles(jsonFile(container,'large-capsule.json'));
+    await expect(reopened.locator('#notice')).toContainText('Capsule reopened',{timeout:90000});
+    if(p.scene)await expect(reopened.locator('#render-status')).toContainText('Gaussian splats loaded');
+    await expect.poll(()=>reopened.locator('#card img').evaluateAll(imgs=>imgs.length===2&&imgs.every(i=>i.naturalWidth===1024))).toBe(true);
+    await expect(reopened.getByLabel('Move memory to')).toBeDisabled();
+    // Download after unpacking in fresh state proves every decoded byte survives.
+    const again=reopened.waitForEvent('download');await reopened.locator('#freeze').click();
+    const restored=JSON.parse(readFileSync(await(await again).path(),'utf8'));
+    expect(restored.assets).toHaveLength(expected.size);
+    for(const asset of restored.assets)expect(Buffer.from(asset.data,'base64').equals(expected.get(asset.path))).toBe(true);
+    await reopened.screenshot({path:info.outputPath('large-capsule.png')});
+    console.log('Portable bytes verified:',[...expected].map(([path,bytes])=>({path,bytes:bytes.length})));
+    expect(errors).toEqual([]);expect(failed).toEqual([]);
+  }finally{await context.close();}
+});
