@@ -3,10 +3,10 @@ import {readFileSync,mkdirSync,writeFileSync} from 'node:fs';
 import {resolve} from 'node:path';
 import {createHash} from 'node:crypto';
 
-test('real museum surface clicks, recall, freeze and fresh-browser reopen',async({page})=>{
+test('gallery to real museum, recall, freeze, fresh reopen and saved return',async({page})=>{
   test.skip(process.env.PALACE_CURATED !== '1','Install the licensed public asset with scripts/prepare-fallback.py.');
   test.setTimeout(600000);
-  const out=resolve('../../artifacts/fallback/proof');mkdirSync(out,{recursive:true});
+  const out=resolve('../../artifacts/gallery/proof');mkdirSync(out,{recursive:true});
   const errors=[],failures=[],bundleRequests=[];
   const watch=p=>{
     p.on('pageerror',e=>errors.push(e.message));
@@ -29,7 +29,23 @@ test('real museum surface clicks, recall, freeze and fresh-browser reopen',async
     await expect(p.locator('#card h2')).toHaveText(title);
     await expect(p.locator(`[data-anchor="${id}"]`)).toHaveAttribute('data-selected','true');
   };
-  watch(page);await page.goto('/?tour=capitoline');await ready(page);
+  watch(page);
+  const galleryRequests=[];
+  page.on('request',r=>galleryRequests.push(r.url()));
+  await page.goto('/?gallery');
+  await expect(page.getByRole('heading',{name:'Give knowledge a place.'})).toBeVisible();
+  await expect(page.getByRole('link',{name:'Explore →',exact:true})).toHaveCount(1);
+  await expect(page.locator('canvas')).toHaveCount(0);
+  for (const proposal of await page.locator('.proposal summary').all()) await proposal.click();
+  await expect(page.locator('.proposal a[href*="tour="]')).toHaveCount(0);
+  await page.screenshot({path:resolve(out,'00-gallery.png'),fullPage:true});
+  await page.setViewportSize({width:390,height:844});
+  await page.screenshot({path:resolve(out,'00-gallery-mobile.png'),fullPage:true});
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  expect(galleryRequests.filter(url=>url.includes('curated-court') || /main-.*\.js/.test(url))).toEqual([]);
+  await page.setViewportSize({width:1440,height:1000});
+  await page.getByRole('link',{name:'Explore →',exact:true}).click();
+  await expect(page).toHaveURL(/\?tour=capitoline$/);await ready(page);
   await expect(page.locator('#places button')).toHaveCount(3);
   await expect(page.locator('.pin')).toHaveCount(0);
   await expect(page.locator('#scene-kind')).toHaveText('Modern museum scan · CC BY 4.0');
@@ -77,6 +93,7 @@ test('real museum surface clicks, recall, freeze and fresh-browser reopen',async
     await context.route('**/curated-court/**',route=>{bundleRequests.push(route.request().url());route.abort();});
     await reopened.goto(process.env.PALACE_BASE_URL || 'http://127.0.0.1:4189');
     await expect(reopened.locator('#scene-kind')).toHaveText('No room imported');
+    await expect(reopened.locator('#file-input')).toBeEnabled({timeout:30000});
     await reopened.locator('#file-input').setInputFiles(capsulePath);await ready(reopened);
     await expect(reopened.locator('#capsule-status')).toContainText('Read-only snapshot');
     await expect(reopened.locator('#capsule-title')).toBeDisabled();
@@ -91,12 +108,20 @@ test('real museum surface clicks, recall, freeze and fresh-browser reopen',async
     await reopened.setViewportSize({width:390,height:844});
     await reopened.screenshot({path:resolve(out,'05-mobile.png'),fullPage:true});
     expect(await reopened.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+    await reopened.getByRole('link',{name:'← Gallery',exact:true}).click();
+    await expect(reopened.getByRole('heading',{name:'Give knowledge a place.'})).toBeVisible();
+    await expect(reopened.locator('canvas')).toHaveCount(0);
+    await reopened.getByRole('link',{name:'Open a saved palace / import',exact:true}).first().click();
+    await ready(reopened);
+    await expect(reopened.locator('#capsule-status')).toContainText('Read-only snapshot');
+    await expect(reopened.locator('#notice')).toContainText('Restored the saved palace');
+    await reopened.screenshot({path:resolve(out,'06-saved-return.png'),fullPage:true});
     expect(bundleRequests).toEqual([]);expect(errors).toEqual([]);expect(failures).toEqual([]);
     writeFileSync(resolve(out,'verification.json'),JSON.stringify({
       verifiedAt:new Date().toISOString(),sceneBytes:72114959,sceneSha256:frozen.palace.curatedTour.sceneSha256,
       capsuleSha256:hash(readFileSync(capsulePath)),surfaceTargets:stops.map(s=>s[0]),
       recall:'hidden → real hand surface → reveal',freshBrowser:true,originalBundleRequests:bundleRequests,
-      refrozenContainerEqual:true,deviceSave:true,deviceReload:"not checked in this bounded run",consoleErrors:errors,networkFailures:failures,
+      refrozenContainerEqual:true,deviceSave:true,deviceReload:true,galleryLazyLoad:true,galleryReturn:true,consoleErrors:errors,networkFailures:failures,
     },null,2));
   } finally {await fresh.close();}
 });
