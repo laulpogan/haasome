@@ -1,0 +1,44 @@
+{
+  "source": "Presenter supplied 18 videos and 5 photos in this conversation; authorized selection for GitHub upload. Filename timestamps are not verified capture times.",
+  "review": "Three sampled frames at 10%, 50%, 90% decoded for every video; not full playback or camera registration.",
+  "baselineDuplicate": true,
+  "files": [
+    {
+      "path": "media/VIDEO-2026-02-22-17-02-00.mp4",
+      "bytes": 2279720,
+      "sha256": "69d81fadb2217529a83c997d1006d692101ad1222d1cc22333680091e175a2d4",
+      "purpose": "reconstruction-candidate",
+      "reason": "Glazed doors and floor at the start; wider table and wall view later.",
+      "height": 832,
+      "width": 464,
+      "duration": 14.650340136054421
+    },
+    {
+      "path": "media/VIDEO-2026-02-22-17-02-15.mp4",
+      "bytes": 1875954,
+      "sha256": "65645b5138fafaecfa0a366aa4d60fc2f09ee14486c7137e24822afb57600632",
+      "purpose": "reconstruction-candidate",
+      "reason": "Wide table, floor, wall prints, mirror and door with less foreground occlusion in sampled views.",
+      "height": 832,
+      "width": 464,
+      "duration": 12.026485260770976
+    },
+    {
+      "path": "media/VIDEO-2026-02-22-17-04-31.mp4",
+      "bytes": 39824087,
+      "sha256": "5e29e76f5d5c929cdf4173ab71250f15df97dc7535db90562e7188893f2e0c20",
+      "purpose": "reconstruction-candidate",
+      "reason": "Longer candidate with camera movement; sampled end shows a different table-side view. Inspect and trim useful subsequences before training.",
+      "height": 832,
+      "width": 464,
+      "duration": 259.64408163265307
+    },
+    {
+      "path": "media/photo-5.jpg",
+      "bytes": 40453,
+      "sha256": "4145549f9518f5f02c82988e3be246e320399e451a4c04d5f44d71854d86c871",
+      "purpose": "memory-context",
+      "reason": "Selected memory/photo detail of medal presentation, table, mirror and doors; people and reflections make it unsuitable as a clean static reconstruction anchor."
+    }
+  ]
+}
