@@ -1,5 +1,9 @@
 # Lane B: licensed sample room
 
+For an authorized local Marble SPZ/PLY export, use the [Marble import runbook](MARBLE.md).
+It emits the same `scene.json` handoff with `kind: generated`; coordinator must
+land that provenance support in the viewer. The licensed fallback below is unchanged.
+
 Fetch and package the selected Table Tennis Room with Python 3's standard library:
 
 ```sh
