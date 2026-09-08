@@ -2,8 +2,8 @@
 
 ## Latest expanded delivery
 
-Use `services/memory/bundles/austin-trip/`: four English cards, three original
-photos and one short MP4. It includes the original corner-kick record unchanged.
+Use `services/memory/bundles/austin-trip/`: five English cards, three original
+photos and two short MP4s. It includes the original corner-kick record unchanged.
 The new media were exported through WhatsApp UI; their records conservatively use
 `manual` packaging because no new context screenshot was successfully saved.
 See the bundle README for provenance, import instructions and remaining checks.

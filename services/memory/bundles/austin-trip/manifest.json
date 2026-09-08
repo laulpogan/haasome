@@ -20,13 +20,18 @@
     "sha256": "b23e1167f6787fb7687f5cc4523bafb7791c557b0eb490fed817e370e7411410"
   },
   {
+    "path": "assets/memory-austin-mit-save/media-0.mp4",
+    "bytes": 1225826,
+    "sha256": "b6a9f04047bf61640625e1ec1c85cd34fccc0e5399549c7dc246b370ca155f28"
+  },
+  {
     "path": "assets/memory-ff1c765d72fc47388946a85e39e92ec5/media-0.jpg",
     "bytes": 2596488,
     "sha256": "bc781e69003b3bb45d54500d56b80cd991dba21d1ddfa7cdfea2e9a491c6342a"
   },
   {
     "path": "memories.json",
-    "bytes": 3580,
-    "sha256": "17cb98c40ab384370117282636312b928200cf7fa37610bb18c12ffa4af64d87"
+    "bytes": 4431,
+    "sha256": "a36fcef733b01eb869cf069f1372568a57e04898abd15502cbeb2dcd986fbf71"
   }
 ]

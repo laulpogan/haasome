@@ -78,5 +78,25 @@
       "capturedAt": "2026-09-08T19:40:00Z",
       "evidenceAsset": null
     }
+  },
+  {
+    "id": "memory-austin-mit-save",
+    "title": "Big save against MI-CHEAT",
+    "body": "Clutch save against MIT in Austin. Yeah, we call them MI-CHEAT 😂",
+    "cue": "What did we call MIT after that clutch save in Austin?",
+    "media": [
+      {
+        "kind": "video",
+        "asset": "assets/memory-austin-mit-save/media-0.mp4",
+        "alt": "Big save against MI-CHEAT"
+      }
+    ],
+    "source": {
+      "kind": "manual",
+      "app": "WhatsApp for Mac + presenter context",
+      "locator": "Austin Soccer Trek 2026 > Kamal Berkeley Haas; February 22, 2026 at 4:46 PM (displayed message time); gallery item 84/171. Presenter identified the play as a save against MIT and supplied the MI-CHEAT nickname and approved wording in this conversation.",
+      "capturedAt": "2026-09-08T19:52:00Z",
+      "evidenceAsset": null
+    }
   }
 ]
