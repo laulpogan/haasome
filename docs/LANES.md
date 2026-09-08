@@ -23,8 +23,9 @@ did not create additional product lanes.
 Prefer ChatGPT Web High for bounded Codex tasks to conserve Astra credits. The
 initial read-only scouts completed, but writer tool calls failed with expired
 tokens / bridge 502s. Two bounded Astra workers at medium reasoning handled A
-and B; coordinator handled the small C exporter. No worker may recursively spawn
-more workers or start paid API jobs. Recheck healthy low-cost routing before
+and B; coordinator handled the small C exporter. Native child agents are now
+authorized for independent bounded work; recursive Codex CLI and paid API jobs
+remain outside scope. Recheck healthy low-cost routing before
 expanding the pool; failed worker launches do not count as implementation progress.
 
 ## A — Spatial experience

@@ -97,5 +97,7 @@ cards are teammate work. Full freeze and training logs are retained outside Git 
 `artifacts/training-ui/`.
 
 The second RTX host is now reachable after the user fixed its SSH access rule.
-A CUDA tensor computation passed there too; an isolated trainer installation is in
-progress. It will run an independent quality candidate after its short probe passes.
+A CUDA tensor computation and isolated trainer installation passed there too.
+Its 10-step probe is running; a conditional command starts an independent
+10000-step quality candidate only if the probe exits zero. The original Dell
+export remains frozen. Both containers and viewers bind their ports to host loopback.

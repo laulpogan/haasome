@@ -51,4 +51,9 @@ was operated to hide cameras and generate an export command. A shell export then
 created a 180224929-byte PLY containing 726707 Gaussians. The palace consumed it and
 the matching screenshot-backed memory bundle, then restored both after reload.
 The new scene's starting orientation was corrected and visually inspected upright.
+The final browser flow exercised recall/reveal with that actual captured lesson,
+waited for the save confirmation, reloaded both bundles, and reported zero console,
+page, or failed HTTP errors. Screenshot: `artifacts/training-ui/palace-complete.png`.
+An earlier test reloaded before asynchronous saving completed; the corrected check
+waits for "Saved on this device" before reload. Large scene saves need that boundary.
 Artifacts and remaining limits are in [training handoff](../pipelines/scene/TRAINING.md).
