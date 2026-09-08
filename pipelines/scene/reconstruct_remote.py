@@ -1,11 +1,13 @@
 """Run inside the existing project trainer; stdout is newline-delimited job events."""
 import argparse
 import fcntl
+import hashlib
 import json
 import math
 import os
 from pathlib import Path
 import signal
+import shutil
 import subprocess
 import time
 import uuid
@@ -14,7 +16,7 @@ ROOT = Path('/workspace/haasome')
 BIN = ROOT / 'venv/bin'
 
 
-def run_job(job_id, lock_fd):
+def run_job(job_id, lock_fd, video_fps=1, iterations=10000):
     job_id = str(uuid.UUID(job_id))
     job = ROOT / 'jobs' / job_id
     source = job / 'input'
@@ -62,7 +64,9 @@ def run_job(job_id, lock_fd):
             if len(files) != 1:
                 raise ValueError('Choose one video or a batch of photos')
             command('extract-frames', ['ffmpeg', '-nostdin', '-v', 'error', '-i', videos[0],
-                    '-t', '120', '-vf', 'fps=1,scale=1600:1600:force_original_aspect_ratio=decrease',
+                    # The feature matcher registered this low-resolution capture
+                    # only at this scale. Training pixels are restored below.
+                    '-t', '120', '-vf', f'fps={video_fps},scale=1600:1600:force_original_aspect_ratio=decrease',
                     '-frames:v', '80', images / 'frame-%04d.jpg'], 120)
         else:
             from PIL import Image, ImageOps
@@ -86,11 +90,34 @@ def run_job(job_id, lock_fd):
         if registered < max(8, math.ceil(count * .6)):
             raise ValueError(f'Only {registered}/{count} views registered; capture more overlap and textured surfaces')
         event('registered', registered=registered, images=count)
+        registration_size = [transforms.get('w'), transforms.get('h')]
+        if videos:
+            from PIL import Image
+            native = job / 'native-frames'
+            native.mkdir()
+            command('native-training-frames', ['ffmpeg', '-nostdin', '-v', 'error', '-i', videos[0],
+                    '-t', '120', '-vf', f"fps={video_fps},scale=w='min(1600,iw)':h='min(1600,ih)':force_original_aspect_ratio=decrease",
+                    '-frames:v', '80', native / 'frame_%05d.jpg'], 120)
+            native_files = sorted(native.glob('*.jpg'))
+            expected = {p.name for p in (processed / 'images').glob('*.jpg')}
+            if {p.name for p in native_files} != expected:
+                raise RuntimeError('Native frames do not match registered image sequence')
+            with Image.open(native_files[0]) as image:
+                width, height = image.size
+            sx, sy = width / transforms['w'], height / transforms['h']
+            for key in ('fl_x', 'cx'):
+                transforms[key] *= sx
+            for key in ('fl_y', 'cy'):
+                transforms[key] *= sy
+            transforms.update(w=width, h=height)
+            for path in native_files:
+                shutil.copyfile(path, processed / 'images' / path.name)
+            (processed / 'transforms.json').write_text(json.dumps(transforms, indent=2))
         output = job / 'outputs'
         common = [BIN / 'ns-train', 'splatfacto', '--vis', 'tensorboard', '--output-dir', output]
         parser = ['nerfstudio-data', '--data', processed, '--downscale-factor', '1']
         command('probe', common + ['--experiment-name', 'probe', '--max-num-iterations', '10'] + parser, 180)
-        command('training', common + ['--experiment-name', 'room', '--max-num-iterations', '3000'] + parser, 300)
+        command('training', common + ['--experiment-name', 'room', '--max-num-iterations', str(iterations)] + parser, 600)
         configs = list((output / 'room/splatfacto').glob('*/config.yml'))
         if len(configs) != 1:
             raise RuntimeError('Expected one training result')
@@ -113,6 +140,16 @@ def run_job(job_id, lock_fd):
                      camera=dict(position=to_y_up(eye), target=to_y_up(target)))
         (bundle / 'scene.json').write_text(json.dumps(scene, indent=2))
         report = dict(images=count, registered=registered, timings=timings,
+                      iterations=iterations, videoFps=video_fps if videos else None,
+                      registrationSize=registration_size,
+                      trainingSize=[transforms.get('w'), transforms.get('h')],
+                      sourceInputs=[dict(file=p.name, sha256=hashlib.sha256(p.read_bytes()).hexdigest())
+                                    for p in files],
+                      frameSampling='ffmpeg fps filter; numbered in output order; not original video frame indices' if videos else None,
+                      sourceFrames=[dict(file=frame['file_path'],
+                          sha256=hashlib.sha256((processed / frame['file_path']).read_bytes()).hexdigest(),
+                          transform=frame['transform_matrix']) for frame in transforms['frames']],
+                      dataparserTransform=parsed,
                       bytes=(bundle / 'splat.ply').stat().st_size,
                       orientation='Nerfstudio estimated up; requires viewer inspection')
         (bundle / 'reconstruction.json').write_text(json.dumps(report, indent=2))
@@ -126,6 +163,9 @@ def run_job(job_id, lock_fd):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('job_id')
+    parser.add_argument('--video-fps', type=int, choices=(1, 2, 3, 4), default=1,
+                        help='Bounded video sampling comparison; still at most 80 frames')
+    parser.add_argument('--iterations', type=int, choices=(3000, 10000), default=10000)
     args = parser.parse_args()
     # Container-wide admission survives local server restarts and disconnected SSH.
     # Child commands inherit the descriptor so an interrupted coordinator cannot
@@ -136,4 +176,4 @@ if __name__ == '__main__':
         except BlockingIOError:
             print(json.dumps({'stage':'failed', 'error':'Another capture job is active on this trainer'}), flush=True)
             raise SystemExit(1)
-        raise SystemExit(run_job(args.job_id, lock.fileno()))
+        raise SystemExit(run_job(args.job_id, lock.fileno(), args.video_fps, args.iterations))
