@@ -269,7 +269,7 @@ baseline poses. A similarity fit across 17 shared camera centers has RMS residua
 0.0271 and maximum 0.0554 in the new scene units; `alignment.json` records the fit.
 Do not use that approximate alignment to transfer object coordinates or claim an
 exact matched-view quality score. The earlier a/b views retain their exact shared
-poses; their complete three-view Spark comparison remains unverified.
+poses; their three-view Spark comparison is now verified as described below.
 
 The isolated Chrome for Testing viewer on port 4187 loaded this candidate with
 reported 0.14–0.17s loads. Its UI created an editable copy and froze a new capsule;
@@ -282,3 +282,26 @@ Remaining capture need: unobstructed original-resolution side-step views around
 the near-right table corner and toward the white door/shelving, with players out
 of frame. Keep table, net and wall layout fixed. The new footage adds coverage but
 still combines moving subjects at those surfaces. Goal remains incomplete.
+
+
+### Matched Spark comparison completed
+
+The baseline a0/a1/a2 and native-10000 b0/b1/b2 capsules have now been inspected
+in the real Spark viewer, including both lateral offsets. This supersedes the
+pending verification notes above. Capsule cameras and scene transforms match
+exactly for each pair; each three-file group embeds the same PLY hash. Center
+views were observed during the 62-view handoff; both side pairs were completed
+in a separate isolated Chrome for Testing tab. Reported side-view render loads:
+baseline left 0.66s, baseline right 0.26s, native left 0.13s, native right 0.12s.
+These are individual viewer observations, not a latency benchmark.
+
+Across these fixed poses, the native 10000-step candidate has clearer print
+borders, mirror outline and door panels than baseline. The table net/edge streaks,
+fragmented people and right boundary smear remain. The observed improvement is
+qualitative and does not satisfy the room-quality target. The 62-view candidate
+remains the stronger experimental handoff; its separately estimated poses still
+prevent treating its comparison as an exact match to the baseline.
+
+The approved capture branch remains at `15e56b7`; no further selected footage
+was available at this check. No additional training was launched. The next data
+needed remains the unobstructed near-right table-to-door arc described above.
