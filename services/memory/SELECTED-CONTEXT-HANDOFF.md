@@ -58,3 +58,22 @@ and media/source display in the live viewer. These remain unverified.
 
 Existing packaging command: `python3 services/memory/export_memory.py --help`.
 No new dependencies, source-app writes, media publication or GPU jobs.
+
+## Offline timeline delivered
+
+A private single-file timeline now consumes the approved five-memory bundle at
+`artifacts/selected-context/timeline/austin-timeline.html`. It embeds three photos,
+two clips and the available evidence screenshot. It orders records by their
+supplied displayed message times, preserves original bodies and provenance, and
+states that capture times and GPS locations are not established. No scene or GPU
+service is required. Open the HTML file in a browser.
+
+Observed in an isolated offline Playwright browser: five records and source
+locators match the input; four images decode; both videos play; no browser errors,
+external requests or mobile horizontal overflow. Desktop and mobile screenshots
+and `verification.json` sit beside the HTML; mobile rendering was visually reviewed.
+
+This is a usable fallback from existing approved material, not new computer-use
+collection or a quality-lane acceptance. Original room/object bindings are untouched.
+The timeline and its private generator, manifest and verification assets remain
+ignored; this handoff contains no private media or captions.
