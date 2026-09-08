@@ -95,10 +95,10 @@
       "cue": "Find the raised finger. Is it ancient or restored, and what did the hand probably hold?",
       "media": [],
       "source": {
-        "kind": "manual",
-        "app": "Musei Capitolini \u00b7 official collection catalog",
+        "kind": "computer-use",
+        "app": "Musei Capitolini \u00b7 read in Chrome using Codex computer use",
         "locator": "https://www.museicapitolini.org/en/node/2695",
-        "capturedAt": "2026-09-08T20:10:00Z",
+        "capturedAt": "2026-09-08T21:55:27Z",
         "evidenceAsset": "hand-reading-note.txt"
       }
     },

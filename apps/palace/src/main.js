@@ -17,6 +17,11 @@ let palace = {schemaVersion:0,scene:null,anchors:defaultAnchors(),memories:[]};
 let assets = new Map(), selected = palace.anchors[0].id, activeMemory = null, recall = null;
 let renderer, controls, mesh, loadGeneration = 0;
 let mediaUrls = [], pins = [], sceneReady = false, creatingMemory = false, tour = null;
+const visitedStops = new Set();
+let recallRound = null;
+const takeaways = {head:'Constantine. A marble head 2.6 metres tall.',hand:'A restored finger. The ancient hand probably held a sceptre.',foot:'Bare feet, more than two metres long: an emperor presented like a god.'};
+const museumRequested = new URLSearchParams(location.search).get('tour') !== 'none';
+if (museumRequested) { document.body.classList.add('museum-loading'); $('loading').hidden = false; $('empty').hidden = true; }
 const world = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(60,1,0.01,10000);
 const room = $('room');
@@ -62,6 +67,7 @@ function selectAnchor(id, focus = true) {
       controls.target.fromArray(anchor.position); camera.position.copy(controls.target).add(offset); controls.update();
     }
   }
+  if (tour && !recall) visitedStops.add(id);
   if (recall && anchor.memoryIds.includes(recall.memoryId)) recall.visited = true;
   renderUI();
 }
@@ -85,10 +91,13 @@ function renderUI() {
   $('home').textContent = tour ? 'Courtyard view' : 'Room view';
   $('scene-title').textContent = tour ? tour.title : (palace.scene ? 'Memory palace' : 'Give a memory a place.');
   $('tour-intro').hidden = !tour;
-  $('tour-intro').textContent = tour ? tour.subtitle : '';
+  $('tour-intro').textContent = tour ? 'Explore the courtyard. Give each story a place, then find your way back from a clue.' : '';
+  $('journey').hidden = !tour;
+  if (tour) $('journey').textContent = recall ? `02 · RECALL — ${recallRound ? recallRound.index+1 : 1} of ${recallRound?.order.length || 1} · Find the object, then remember its story` : `01 · EXPLORE — ${visitedStops.size} of 3 places visited · Head → Hand → Foot`;
+  $('recall').textContent = tour ? (recall ? 'Restart recall' : 'Test my memory') : 'Begin recall';
   $('tour-binding').hidden = !tour;
-  $('tour-binding').textContent = tour ? 'Click the marble objects · Curator-placed regions · Scene bytes verified' : '';
-  if (tour) $('scene-kind').textContent = 'Modern museum scan · CC BY 4.0';
+  $('tour-binding').textContent = tour ? 'Click an object to visit its story' : '';
+  if (tour) $('scene-kind').textContent = 'A memory palace in Rome · Sample scene';
   $('folio-label').textContent = tour ? 'Three fragments. One emperor.' : 'Memory folio';
   $('capsule-title').value = palace.capsule?.title || 'A moment to keep';
   $('capsule-title').disabled = frozen();
@@ -104,12 +113,12 @@ function renderUI() {
   for (const url of mediaUrls) URL.revokeObjectURL(url); mediaUrls = [];
   $('places').replaceChildren(); $('pins').replaceChildren(); pins = [];
   palace.anchors.filter(a => !tour || tour.regions.some(r => r.anchorId === a.id)).forEach((a,i) => {
-    const b = button(a.label,() => selectAnchor(a.id)); b.setAttribute('aria-pressed',String(a.id === selected));
-    b.append(node('span',tour ? `Stop ${i+1} · ${a.memoryIds.length} catalog note` : `${a.memoryIds.length} ${a.memoryIds.length === 1 ? 'memory' : 'memories'}`)); $('places').append(b);
+    const b = button(tour && recall && !recall.revealed ? `Place ${i+1}` : a.label,() => selectAnchor(a.id)); b.setAttribute('aria-pressed',String(a.id === selected));
+    b.append(node('span',tour ? (recall && !recall.revealed ? 'Find the place from your clue' : `${visitedStops.has(a.id) ? 'Visited' : 'Visit'} · ${['Identity','Restoration','Power'][i]}`) : `${a.memoryIds.length} ${a.memoryIds.length === 1 ? 'memory' : 'memories'}`)); $('places').append(b);
     if (tour) {
       const region = tour.regions.find(r => r.anchorId === a.id);
       const el = node('div',null,'object-region'); el.dataset.anchor = a.id; el.dataset.selected = String(a.id === selected && !recall);
-      el.setAttribute('aria-hidden','true'); el.append(node('span',`${i+1} · ${a.label}`));
+      el.setAttribute('aria-hidden','true'); el.append(node('span',tour && recall && !recall.revealed ? `${i+1}` : `${i+1} · ${a.label}`));
       $('pins').append(el); pins.push({anchor:a,el,region}); return;
     }
     const pin = button('✦',() => selectAnchor(a.id)); pin.className = 'pin'; pin.setAttribute('aria-label',`Visit ${a.label}`); pin.setAttribute('aria-pressed',String(a.id === selected)); pin.hidden = true;
@@ -122,9 +131,9 @@ function renderUI() {
   $('cue').replaceChildren(); $('cue').hidden = !recall;
   if (recall) {
     const m = palace.memories.find(x => x.id === recall.memoryId);
-    $('cue').append(node('small','Recall cue'),node('p',m.cue),node('small',recall.visited ? 'Place visited. Reveal when you are ready.' : 'Visit the place that holds this memory.'),button('End recall',() => { recall = null; renderUI(); }));
+    $('cue').append(node('small','Recall cue'),node('p',m.cue),node('small',recall.visited ? 'Place visited. Reveal when you are ready.' : 'Visit the place that holds this memory.'),button('Back to exploring',() => { recall = null; recallRound = null; renderUI(); }));
     if (!recall.revealed) {
-      card.append(node('h2',a.label),node('p','Keep the detail in mind. Find its place, then reveal the source.'));
+      card.append(node('h2',recall.visited && a.memoryIds.includes(recall.memoryId) ? 'You found its place.' : 'Where does this story live?'),node('p','Say the detail to yourself before revealing it. Use the object in the room or a place button below.'));
       const reveal = button('Reveal memory & source',() => { recall.revealed = true; activeMemory = recall.memoryId; renderUI(); }); reveal.disabled = !recall.visited || !a.memoryIds.includes(recall.memoryId); card.append(reveal); return;
     }
   }
@@ -135,10 +144,15 @@ function renderUI() {
     const picker = node('select'); picker.className = 'memory-picker'; picker.setAttribute('aria-label','Memory at this place');
     memories.forEach(x => { const option = node('option',x.title); option.value = x.id; picker.append(option); }); picker.value = m.id; picker.onchange = () => { activeMemory = picker.value; renderUI(); }; card.append(picker);
   }
-  card.append(node('small',a.label),node('h2',m.title),node('p',m.body,'body'));
+  card.append(node('small',a.label),node('h2',m.title));
+  if (tour) {
+    card.append(node('p',takeaways[a.id] || m.body,'takeaway'));
+    const story = node('details',null,'full-story'); story.append(node('summary','The story behind it'),node('p',m.body,'body')); card.append(story);
+  } else card.append(node('p',m.body,'body'));
   for (const media of m.media) showAsset(card,media.asset,media.kind,media.alt);
-  const source = node('section',null,'source');
-  const kind = tour ? 'Curated museum catalog note · manual import' : {fixture:'Fixture — synthetic content',manual:'Manual selected media / import — no computer-use capture', 'computer-use':'Computer-use record — capture claimed by producer'}[m.source.kind];
+  const source = node(tour ? 'details' : 'section',null,'source');
+  if (tour) source.append(node('summary','Source & reading note'));
+  const kind = tour ? (m.source.kind === 'computer-use' ? 'Read from the museum website with computer use' : 'Curated museum catalog note · manual import') : {fixture:'Fixture — synthetic content',manual:'Manual selected media / import — no computer-use capture', 'computer-use':'Computer-use record — capture claimed by producer'}[m.source.kind];
   source.append(node('strong',kind),node('p',m.source.app));
   try {
     const url = new URL(m.source.locator);
@@ -159,11 +173,23 @@ function renderUI() {
   else source.append(node('p','No source evidence supplied.'));
   card.append(source);
   if (tour) {
-    const index = tour.regions.findIndex(r => r.anchorId === a.id);
-    card.append(button(index < tour.regions.length-1 ? 'Next fragment →' : 'Return to the courtyard',() => {
-      if (index < tour.regions.length-1) selectAnchor(tour.regions[index+1].anchorId); else home();
-    }));
-    card.append(node('p','Look → read → recall. Begin recall hides the detail until you revisit its object.','tour-hint'));
+    if (recall?.revealed) {
+      card.append(node('p','Compare the story with what you remembered. This is a self-check, not an automatic score.','tour-hint'));
+      card.append(button(recallRound && recallRound.index < recallRound.order.length-1 ? 'Next memory →' : 'Finish my recall', () => {
+        if (recallRound && recallRound.index < recallRound.order.length-1) { recallRound.index++; startRecall(recallRound.order[recallRound.index]); }
+        else {
+          recall = null; recallRound = null; home(); renderUI();
+          $('journey').textContent = '03 · RETURN — You revisited your memories through their places';
+          $('card').replaceChildren(node('small','YOUR MEMORY PALACE'),node('h2','A place for every story.'),node('p','You explored the fragments, hid their stories, and found your way back. Return to any object to revisit its memory.'),button('Explore again',()=>selectAnchor(tour.regions[0].anchorId)),button('Recall again',()=>beginMuseumRecall()));
+        }
+      }));
+    } else {
+      const index = tour.regions.findIndex(r => r.anchorId === a.id);
+      card.append(button(index < tour.regions.length-1 ? 'Next place →' : 'Test my memory →',() => {
+        if (index < tour.regions.length-1) selectAnchor(tour.regions[index+1].anchorId); else beginMuseumRecall();
+      }));
+      card.append(node('p','Picture this object when you think of its story.','tour-hint'));
+    }
     return;
   }
   const editor = node('details'); editor.id = 'memory-editor';
@@ -319,12 +345,19 @@ $('place-form').onsubmit = (event) => {
   const label = $('place-label').value.trim(); if (!label || !position.every(Number.isFinite)) return;
   const a = palace.anchors.find(x => x.id === selected); a.label = label; a.position = position; renderUI(); notice('Place updated. Save on this device to keep it.');
 };
-$('recall').onclick = () => {
-  const m = palace.memories.find(x => palace.anchors.find(a => a.id === selected)?.memoryIds.includes(x.id)) || palace.memories.find(x => palace.anchors.some(a => a.memoryIds.includes(x.id)));
-  if (!m) return;
-  recall = {memoryId:m.id,visited:false,revealed:false};
-  selected = palace.anchors.find(a => !a.memoryIds.includes(m.id))?.id || selected;
+function startRecall(memoryId) {
+  recall = {memoryId,visited:false,revealed:false};
+  selected = palace.anchors.find(a => !a.memoryIds.includes(memoryId))?.id || selected;
   home(); renderUI();
+}
+function beginMuseumRecall() {
+  recallRound = {order:['hand-note','head-note','foot-note'].filter(id=>palace.memories.some(m=>m.id===id)),index:0};
+  if (recallRound.order.length) startRecall(recallRound.order[0]);
+}
+$('recall').onclick = () => {
+  if (tour) return beginMuseumRecall();
+  const m = palace.memories.find(x => palace.anchors.find(a => a.id === selected)?.memoryIds.includes(x.id)) || palace.memories.find(x => palace.anchors.some(a => a.memoryIds.includes(x.id)));
+  if (m) startRecall(m.id);
 };
 $('save').onclick = async () => {
   $('save').disabled = true;
@@ -369,7 +402,7 @@ try {
   if (stored) { palace = validatePalace(stored.palace); if (!frozen() && !readTour(palace)) completeAnchors(palace); assets = new Map(stored.assets); selected = palace.anchors[0].id; notice('Restored the saved palace and its local assets.'); }
 } catch (error) { notice(`Saved palace unavailable: ${error.message}. Reimport your bundle.`); }
 // The dedicated URL opens this public educational bundle without touching source apps.
-if (new URLSearchParams(location.search).get('tour') === 'capitoline') {
+if (museumRequested && (new URLSearchParams(location.search).get('tour') === 'capitoline' || !palace.scene)) {
   try {
     const response = await fetch('/curated-court/palace.json');
     if (!response.ok) throw new Error('Run the fallback preparation script to install the licensed bundle.');
@@ -377,15 +410,38 @@ if (new URLSearchParams(location.search).get('tour') === 'capitoline') {
     const paths = [draft.scene.asset,...new Set(draft.memories.map(m => m.source.evidenceAsset).filter(Boolean))];
     const files = [new File([JSON.stringify(draft)],'palace.json',{type:'application/json'})];
     for (const path of paths) {
-      assetPath(path); const asset = await fetch(`/curated-court/${path}`);
-      if (!asset.ok) throw new Error(`Missing exhibit asset: ${path}`);
-      files.push(new File([await asset.blob()],path,{type:path.endsWith('.txt') ? 'text/plain' : 'application/octet-stream'}));
+      assetPath(path);
+      if (path === draft.scene.asset && !import.meta.env.DEV) {
+        const index = await fetch('/curated-court/scene-parts.json');
+        if (!index.ok) throw new Error('The courtyard is not prepared. Build the app after installing the scene.');
+        const manifest = await index.json();
+        if (manifest.asset !== path || !Array.isArray(manifest.parts) || manifest.parts.length !== 4) throw new Error('Invalid courtyard delivery manifest.');
+        let received = 0;
+        const parts = await Promise.all(manifest.parts.map(async part => {
+          assetPath(part); const response = await fetch(`/curated-court/${part}`);
+          if (!response.ok) throw new Error('A courtyard file could not download. Please reload.');
+          const blob = await response.blob(); received += blob.size;
+          $('loading-status').textContent = `Loading the courtyard · ${Math.round(received / manifest.bytes * 100)}%`;
+          return blob;
+        }));
+        const file = new File(parts,path,{type:'application/octet-stream'});
+        if (file.size !== manifest.bytes) throw new Error('Courtyard download incomplete. Please reload.');
+        files.push(file);
+      } else {
+        const asset = await fetch(`/curated-court/${path}`);
+        if (!asset.ok) throw new Error(`Missing exhibit asset: ${path}`);
+        files.push(new File([await asset.blob()],path,{type:'text/plain'}));
+      }
     }
     // Explicit demo navigation starts a new draft; it does not overwrite device storage.
     palace = {schemaVersion:0,scene:null,anchors:defaultAnchors(),memories:[]};
+    $('loading-status').textContent = 'Opening the 3D courtyard…';
     await importFiles(files);
+    if (tour) { visitedStops.add(selected); renderUI(); notice('Sample palace · Licensed scene by artfletch · Stories from Musei Capitolini · No sign-in needed'); }
   } catch (error) { notice(`Exhibit unavailable: ${error.message}`); }
+  finally { $('loading').hidden = true; document.body.classList.remove('museum-loading'); }
 }
+$('loading').hidden = true; document.body.classList.remove('museum-loading');
 let pointerStart = null;
 renderer?.domElement.addEventListener('pointerdown',event => { pointerStart = [event.clientX,event.clientY,event.button]; });
 renderer?.domElement.addEventListener('pointerup',event => {

@@ -1,3 +1,23 @@
+# Haasome museum delivery
+
+Open the root URL to explore the Capitoline sample palace: visit head → hand → foot, test your memory, return to the right object, and reveal its source. `?tour=none` opens the original personal-bundle workspace. File, save and snapshot actions are under **My palace & files**.
+
+Prepare the licensed scene from the repository root:
+
+```sh
+cd apps/palace
+python3 scripts/prepare-fallback.py
+npm ci
+npm run build
+npm run preview
+```
+
+The build splits the 72 MB scene into four delivery files and verifies the reassembled SHA-256 in the viewer. The geometry is a licensed sample by artfletch; object regions are manually curated. One memory was read in Chrome through Codex computer use on September 8; its reading record is in `curated/hand-reading-note.txt`. The website consumes that record and does not run an agent or call a model API.
+
+Verification: six contract checks plus `tests/delivery.spec.js` exercise the real scene, wrong/correct recall selection, source reveal, device save/reload, and narrow viewport. Use `PALACE_CHROME=1` to test with installed Chrome and `PALACE_BASE_URL` for a custom preview port.
+
+---
+
 # Haasome palace viewer
 
 Lane A: local Gaussian-splat viewer with five spatial anchors, text/image/video

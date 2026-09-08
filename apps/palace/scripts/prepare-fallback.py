@@ -68,6 +68,11 @@ def main():
                 f"Consulted: {source['capturedAt']}\n"
                 'Curator paraphrase, not a source screenshot or computer-use capture.\n'
                 f"Scene attribution: {PALACE['scene']['provenance']['attribution']}\n")
+        capture = APP / 'curated' / source['evidenceAsset']
+        if source['kind'] == 'computer-use':
+            if not capture.is_file():
+                raise RuntimeError('Computer-use evidence must exist; preparation cannot manufacture it.')
+            note = capture.read_text()
         (BUNDLE / source['evidenceAsset']).write_text(note)
     link = APP / 'public/curated-court'
     if link.is_symlink():

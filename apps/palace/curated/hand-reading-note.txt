@@ -1,0 +1,12 @@
+Computer-use reading record — Constantine's right hand
+
+Source: https://www.museicapitolini.org/en/node/2695
+Page title observed: Colossal statue of Constantine: right hand
+Observed: 2026-09-08T21:55:27Z
+Method: Codex opened the public catalog in Chrome through the computer-use interface and read the rendered accessibility content. A browser screenshot was retained locally. No source-page records were modified.
+
+Extracted detail (paraphrase): The raised index finger is a later restoration. The ancient hand probably held a sceptre. The source presents that missing object as a probable interpretation, not certainty.
+
+Short source excerpt: "is a modern integration of an ancient fragment."
+
+Human-readable handoff: Place this fact at the courtyard's hand object. The existing region was manually curated; computer use did not identify or place the 3D object. The app imports this saved record; it does not run a browser agent or call a model at runtime. The other two catalog memories remain manual notes.
