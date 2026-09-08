@@ -216,3 +216,69 @@ mirror frame from both sides; reflections are not independent room geometry.
 More blurry frames from the existing position cannot supply those hidden surfaces.
 The collection-lane message was rejected because project agent messaging was off;
 this request has not been confirmed delivered to that lane.
+
+### Additional selected footage: 62-view candidate
+
+The presenter-approved `codex/tito-whatsapp-handoff` commit `15e56b7` supplied
+three additional same-room clips. Input hashes and byte counts matched its
+selection manifest. Contact-sheet inspection found the same table and fixed wall
+layout; moving people and small table props change. The selected photo remains
+memory context and was excluded from reconstruction.
+
+Private artifacts live in `artifacts/quality/additional-15e56b7/`. A bounded
+selection kept 73 native-resolution frames: the original 17, fourteen from the
+first short clip, twelve from the second, and fifteen each from seconds 90–120
+and 210–240 of the long clip. The new windows use the highest interior Laplacian
+variance among sampled frames per interval; this proxy does not certify blur or
+semantic quality. `source-frames.json` preserves source hashes, sampled timestamps,
+frame indices and extracted-frame hashes. Registration used enlarged images;
+training restored native 464 × 832 pixels and rescaled intrinsics.
+
+The first exported COLMAP component contained only five images. Training stopped
+at the coverage gate. Inspection found a second component with 62/73 images:
+all 17 baseline views, 9 and 12 from the short clips, and 10 and 14 from the long
+windows. Converting `processed/colmap/sparse/1` with the installed
+`colmap_to_json` recovered that connected component without rerunning mapping.
+The normal worker still consumes the default component; selecting the largest
+valid component is a proposed worker fix, not a shipped behavior change.
+
+Observed seconds: selection 1.345; registration 42.892; ten-step probe 8.233;
+10000-step training 70.925; export 9.339. Transfer completed and its asset hash
+matched, but transfer duration was not isolated. PyTorch peak allocated CUDA
+memory was 3,515,978,240 bytes; reserved was 3,546,284,032 bytes. These counters
+exclude non-PyTorch allocations. No unrelated GPU job was stopped.
+
+Best current experimental export: `bundle/scene.json` and `bundle/splat.ply` under
+that artifact directory. Scene ID `capture-additional-15e56b7`; PLY 45,807,193
+bytes; SHA-256 `5ab5de57f6aae90033c3b65466e307fc00272af842297069178c0df499ddd6ef`.
+Start the viewer with the commands above and import those two files, or import the
+candidate capsule. `bundle/reconstruction.json` contains all 62 source-frame poses,
+intrinsics and dataparser transform. `scene.json` contains the final presentation
+camera and scene transform. Old object bindings must not be reused.
+
+Three Nerfstudio renders and three real Spark views were inspected. The table
+edges/net, three prints, mirror frame and white door are clearer in the center
+and left view. Rightward movement still crosses a large ghosted player/surface,
+partly obscuring the door and table. This candidate improves the strongest honest
+result but does not satisfy the full visual target.
+
+`views.json` uses the re-estimated baseline frame 13 camera with lateral offsets
+0, -0.08 and +0.08 in the new reconstruction's units. The `view-capsules/c{0,1,2}.json`
+files carry these views with empty memory bindings. They are not exact matched
+baseline poses. A similarity fit across 17 shared camera centers has RMS residual
+0.0271 and maximum 0.0554 in the new scene units; `alignment.json` records the fit.
+Do not use that approximate alignment to transfer object coordinates or claim an
+exact matched-view quality score. The earlier a/b views retain their exact shared
+poses; their complete three-view Spark comparison remains unverified.
+
+The isolated Chrome for Testing viewer on port 4187 loaded this candidate with
+reported 0.14–0.17s loads. Its UI created an editable copy and froze a new capsule;
+`capsule.json` retains the downloaded file, and its embedded PLY hash matches the
+export. Fresh-tab reopen displayed the room and reported a 2.62s render load
+and "Capsule reopened with its saved assets." These empty-memory snapshots
+establish scene transport only.
+
+Remaining capture need: unobstructed original-resolution side-step views around
+the near-right table corner and toward the white door/shelving, with players out
+of frame. Keep table, net and wall layout fixed. The new footage adds coverage but
+still combines moving subjects at those surfaces. Goal remains incomplete.
