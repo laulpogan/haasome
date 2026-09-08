@@ -26,7 +26,7 @@ loopback Host, same Origin, and a session token. Do not proxy this service publi
 
 Remote stages: decode/resize selected images, or extract up to 80 video frames
 from the first 120 seconds; estimate camera poses; require at least eight and
-60% registered views; run a ten-step probe; train 3000 steps; export Gaussians.
+60% registered views; run a ten-step probe; train 10000 steps; export Gaussians.
 Each command has a timeout within a 25-minute processing budget. A container-wide
 file lock prevents simultaneous capture workers, including after local restarts.
 Setup, transfer and browser load are outside that processing budget.
@@ -99,3 +99,90 @@ subjects. See [capture guidance](CAPTURE.md).
 Nerfstudio's [custom-data instructions](https://docs.nerf.studio/quickstart/custom_dataset.html)
 and COLMAP's [capture guidance](https://colmap.github.io/tutorial.html) explain the
 need for overlapping, sharp views. Random camera-roll memories remain content.
+
+
+## Room-quality comparison, September 8
+
+Native-resolution training plus 10000 steps improves table lines, print borders,
+and doorway edges in the controlled comparison. People remain fragmented and
+unseen surfaces remain unsupported. The visual goal is incomplete; keep the
+original capsule and object bindings intact.
+
+The source is 464 × 832. The original worker enlarged it to 892 × 1600 for both
+registration and training. Native-only registration recovered 3/17 views at one
+frame per second and 4/68 at four frames per second. Neither passed admission.
+The revised worker retains the demonstrated feature-matching enlargement, then
+extracts native training pixels from the original video and rescales focal lengths
+and principal points to those dimensions. It checks the processed filename set
+before replacement. No new image detail is claimed from enlargement.
+
+The controlled comparison retained the baseline poses and sparse initialization,
+changing training resolution and iteration count. The native 3000-step result
+looked worse than baseline. Native 10000 steps reduced jagged table and wall
+artifacts; enlarged 10000 steps produced a similar improvement. All four exports
+were rendered in Nerfstudio from three identical camera poses, including left and
+right offsets of 0.08 scene units. These are small offsets, not an orbit or evidence
+of unseen geometry. Camera/dataparser transforms matched across those four runs.
+
+| Configuration | Training seconds | Export seconds |
+| --- | ---: | ---: |
+| Native, 3000 steps | 24.781 | 9.186 |
+| Native, 10000 steps | 68.126 | 8.389 |
+| Enlarged, 10000 steps | 99.310 | 8.481 |
+
+Native extraction took 0.164s and its ten-step probe took 8.136s. Baseline timing
+remains in the earlier section. These are warm runs on the prepared trainer.
+Peak GPU memory was not sampled; do not infer it from output size or throughput.
+
+The existing `CaptureJobs.run` caller also exercised the revised worker from raw
+video through return transfer: 17/17 views registered; extraction 0.21s,
+registration 7.13s, native replacement 0.16s, probe 8.14s, training 67.68s, export
+8.04s, upload 8.83s, return 19.84s. Its output was 25,274,777 bytes. Independent
+registration changed its coordinate transform; it is a separate scene, not the
+fixed-pose comparison candidate. It has not been selected for viewer handoff.
+
+Operator comparisons may pass `--video-fps 1|2|3|4` and
+`--iterations 3000|10000` to the per-job remote worker. The browser caller uses
+one frame per second and 10000 steps. Keep the existing 80-frame cap and trainer
+lock. `reconstruction.json` now retains input/frame hashes, registered frame poses,
+training/registration dimensions and dataparser transforms for the next lane.
+
+### Private candidate handoff
+
+In the room-quality worktree, open `artifacts/quality/native-10000/scene.json` and
+`splat.ply` through the existing importer. Start the app with the build and
+`serve_capture.py` commands at the top of this document. Scene ID:
+`capture-quality-native-10000-20260908`; asset SHA-256:
+`55371fe5790d4b1992012d469ea2d809359c5ad10ba72f25340514678f28b881`.
+The PLY is 31,183,129 bytes; transfer took 19.974s. Transform and camera are in
+`scene.json`; comparison poses are in `artifacts/quality/views.json`. Source
+frames and baseline poses are retained in the original capture job; the native
+comparison preserves that pose mapping. Private comparison scripts, rendered views
+and timings remain under `artifacts/quality/`, outside Git.
+
+Observed in the real Chrome/Spark viewer: candidate imported with a reported
+0.34s render load and recognizable room objects. Jagged people and the right-edge
+smear remain. The app froze a separate candidate capsule, whose embedded PLY hash
+matches the candidate. `artifacts/quality/native-10000/capsule.json` holds that
+snapshot with empty memory bindings. Fresh-tab reopen and three matched Spark
+views remain unverified: headless browser checks timed out and native file-picker
+control stalled. Do not describe the Nerfstudio comparisons as Spark comparisons
+or the candidate as the completed memory capsule.
+
+The installed Splatfacto loss multiplies both target and prediction by each mask;
+its dataparser requires mask paths for all frames or none. No masked result is
+claimed. Masking has not been tested and cannot reveal surfaces hidden in every
+source frame. A requested read-only review stopped at workspace trust; it supplied
+no verdict.
+
+### Missing capture request
+
+Request the presenter's selected original-resolution same-room material, ideally
+1080p or higher: slow side-step arcs around both near table corners; frontal and
+oblique views of the heart print, neighboring prints, round mirror frame and white
+doorway. Pause at each view. Keep the table and room layout fixed, and clear moving
+players so table edges, legs and the wall behind them become visible. Capture the
+mirror frame from both sides; reflections are not independent room geometry.
+More blurry frames from the existing position cannot supply those hidden surfaces.
+The collection-lane message was rejected because project agent messaging was off;
+this request has not been confirmed delivered to that lane.
