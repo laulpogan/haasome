@@ -30,9 +30,9 @@ is the presenter-requested personal-memory input trial, using the same contract.
   privately for reconstruction coverage; no reconstruction-ready dataset or splat
   has been established by this trial.
 
-Private captions, identities, group title, photos and screenshots are deliberately
-not embedded in this public handoff. The detailed source locators are retained in
-the presenter's ignored `artifacts/memory/` directory.
+The presenter explicitly authorized publishing the selected photo, source-UI
+screenshot and memory record in `bundles/austin-corner-kick/`. Broader discovery
+notes remain in the presenter's ignored `artifacts/memory/` directory.
 
 ## Capture and packaging procedure
 
@@ -62,7 +62,7 @@ For a real observed capture, supply `--kind computer-use`, `--observed-capture`,
 `--cue`, and an unused `--output artifacts/memories/<chosen-name>` directory.
 The attestation flag describes an observation; it does not create proof by itself.
 
-7. Give A the entire private output folder (`memories.json` **and** `assets/`).
+7. Give A the entire output folder (`memories.json` **and** `assets/`).
    Import it through the existing viewer memory-bundle flow, attach it to an anchor,
    and observe source reveal, recall and reload. Do not call this step complete
    merely because the JSON validates.
@@ -80,13 +80,11 @@ does not automate WhatsApp navigation.
   WhatsApp app; no standalone automation start command is claimed.
 - **Input:** one presenter-selected group and selected visible media/captions;
   actual saved local evidence/media are required for packaging.
-- **Public output:** this workflow and observed-status report; no private assets.
-- **Private bundle:** `artifacts/memories/austin-corner-kick/` in the presenter's
-  project checkout, containing `memories.json`, the original JPEG, the source-UI
-  evidence JPEG, and a SHA-256 asset manifest.
-- **Private transfer archive:** `artifacts/memories/austin-corner-kick-private.zip`.
-  Unzip it and import the contained `austin-corner-kick` folder with **Open bundle**
-  after choosing a place in A's viewer. Do not upload this archive to the public repo.
+- **Published output:** this report and `services/memory/bundles/austin-corner-kick/`,
+  containing `memories.json`, the original JPEG, the source-UI evidence JPEG,
+  a SHA-256 asset manifest and English import instructions.
+- **Import:** check out this branch and choose the entire `austin-corner-kick`
+  folder with **Open bundle** after choosing a place in A's viewer.
 - **Private notes:** `artifacts/memory/austin-review.md` and
   `artifacts/memory/austin-handoff-en.md` in the presenter's project checkout.
 - **Observed result:** real UI navigation, photo save, screenshot save, export of
@@ -102,6 +100,6 @@ does not automate WhatsApp navigation.
   nonempty; original and copied asset hashes match. The transfer ZIP was checked.
   No product code changes, new dependencies or synthetic capture claims.
 
-Keep all private bundles outside Git. Transfer selected assets through an approved
-private channel or directly on the demo machine. The coordinator decides whether
-this input is used in the final public demo.
+This selected bundle is published at the presenter's explicit request. Broader
+group material and local discovery notes remain outside Git. The coordinator
+decides whether this input is used in the final demo.

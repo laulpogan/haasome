@@ -1,0 +1,22 @@
+[
+  {
+    "id": "memory-235c032afd18495d9a1f49823c3b047f",
+    "title": "A smile before the corner kick",
+    "body": "I shared a match photo in our Austin soccer trip group and joked that Martin was smiling even as he was about to head the ball from a corner kick. This detail comes from my caption, not face recognition.",
+    "cue": "What made me laugh about the corner-kick photo?",
+    "media": [
+      {
+        "kind": "image",
+        "asset": "assets/memory-235c032afd18495d9a1f49823c3b047f/media-0.jpg",
+        "alt": "A smile before the corner kick"
+      }
+    ],
+    "source": {
+      "kind": "computer-use",
+      "app": "WhatsApp for Mac",
+      "locator": "Austin Soccer Trek 2026 > photo sent by You on February 22, 2026 at 5:12 PM (displayed message time); gallery item 139/171 at inspection",
+      "capturedAt": "2026-09-08T19:24:00Z",
+      "evidenceAsset": "assets/memory-235c032afd18495d9a1f49823c3b047f/evidence.jpg"
+    }
+  }
+]
