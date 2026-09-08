@@ -14,3 +14,18 @@ test('nested bundle assets resolve; ambiguous file names do not', () => {
   assert.equal(resolveAsset(new Map([['evidence.png','ok']]),'assets/memory-a/evidence.png'),'ok');
   assert.equal(resolveAsset(new Map([['a/evidence.png','a'],['b/evidence.png','b']]),'evidence.png'),undefined);
 });
+
+import {freezeCapsule, unpackCapsule, validateCapsule} from '../src/capsule.js';
+test('portable capsule includes only references, preserves bytes, rejects missing assets', async () => {
+  const p = fixture(); p.scene.provenance.kind = 'generated';
+  const paths = new Map([[p.scene.asset,new Blob([new Uint8Array([0,1,254,255])])],['unused.txt',new Blob(['excluded'])]]);
+  const c = await freezeCapsule(p,paths,'Test capsule');
+  assert.equal(c.assets.length,1);
+  assert.deepEqual([...new Uint8Array(await unpackCapsule(c).get(p.scene.asset).arrayBuffer())],[0,1,254,255]);
+  assert.equal(p.capsule,undefined);
+  assert.equal(c.palace.capsule.title,'Test capsule');
+  await assert.rejects(freezeCapsule(p,new Map(),'Test'),/Missing referenced asset/);
+  for (const change of [c=>c.assets.push(c.assets[0]), c=>c.assets[0].path='../escape', c=>c.assets[0].data='broken', c=>c.assets.pop(), c=>c.palace.capsule.frozenAt='yesterday', c=>c.capsuleVersion=2, c=>c.assets[0].path='unreferenced']) {
+    const bad=structuredClone(c); change(bad); assert.throws(()=>validateCapsule(bad));
+  }
+});

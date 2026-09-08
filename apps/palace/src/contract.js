@@ -11,7 +11,7 @@ export function validateScene(s) {
   if (!s || typeof s !== 'object') fail('Scene object required.');
   text(s.id, 'Scene ID'); assetPath(s.asset);
   if (!['ply','spz','splat','ksplat','sog','rad'].includes(s.format)) fail('Unsupported splat format. Use ZIP-packaged .sog, PLY, SPZ, SPLAT, KSPLAT, or RAD.');
-  if (!['captured','licensed-sample','fixture'].includes(s.provenance?.kind)) fail('Scene provenance required.');
+  if (!['captured','licensed-sample','fixture','generated'].includes(s.provenance?.kind)) fail('Scene provenance required.');
   text(s.provenance.attribution, 'Scene attribution');
   vector(s.transform?.position, 3, 'Scene position'); vector(s.transform?.rotation, 4, 'Quaternion');
   if (Math.abs(Math.hypot(...s.transform.rotation) - 1) > 0.01) fail('Scene quaternion must be normalized.');
@@ -44,6 +44,10 @@ export function defaultAnchors(target = [0,1,0], spacing = 0.7) {
 }
 export function validatePalace(p) {
   if (p?.schemaVersion !== 0) fail('Expected palace schemaVersion 0.');
+  if (p.capsule !== undefined) {
+    text(p.capsule?.id, 'Capsule ID'); text(p.capsule?.title, 'Capsule title');
+    if (p.capsule.frozenAt != null && (typeof p.capsule.frozenAt !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/.test(p.capsule.frozenAt) || !Number.isFinite(Date.parse(p.capsule.frozenAt)))) fail('Frozen timestamp must be ISO-8601 UTC.');
+  }
   if (p.scene !== null) validateScene(p.scene);
   validateMemories(p.memories);
   if (!Array.isArray(p.anchors) || !p.anchors.length || p.anchors.length > 5) fail('This slice supports one to five anchors.');
