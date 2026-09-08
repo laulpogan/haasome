@@ -53,11 +53,17 @@ scene geometry so a new splat does not require rebuilding the ingestion flow.
 ## Infrastructure allocation
 
 Reported resources: two DGX Sparks and two RTX Pro 6000 GPUs over Tailscale.
-Availability, exact GPU variants, host architecture, environment, and capacity
-remain unverified until the lane owner checks the actual host.
+Read-only checks on 2026-09-08 reached both GB10 hosts and one RTX PRO 6000 Blackwell
+Workstation Edition through established SSH aliases. The second reported RTX GPU
+has not been verified. No ready room-reconstruction stack was found on the checked
+hosts; the GB10 Python environments also emitted a CUDA architecture warning.
 
 Give B one compatible free RTX host for reconstruction; keep the other as a
 separate fallback, not distributed training. Use a Spark only if C already has a
 working compatible inference service and approved model. Leave spare machines idle
 when they do not shorten the critical path. The demo viewer must work without an
 SSH round trip for every camera movement.
+
+Use an existing licensed room splat for the first integrated slice. Fresh capture
+and environment setup remain a separate lane B milestone. No reconstruction timing
+or browser performance has been measured. See [feasibility](docs/FEASIBILITY.md).

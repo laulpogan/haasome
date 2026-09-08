@@ -1,7 +1,13 @@
 # Three lanes / seven hours
 
 The coordinator owns integration and shared files. Teammates claim A, B, or C.
-Workstream names are ownership slots, not assigned people or running agents.
+Codex workers now occupy A, B, and C in isolated worktrees. Human teammates should
+coordinate before taking the same write scope. Two read-only scouts support asset
+licensing and GPU readiness; they do not create additional product lanes.
+
+Use ChatGPT Web High for these bounded Codex tasks to conserve Astra credits.
+No worker may recursively spawn more workers or start paid API jobs. Keep Astra
+for coordinator decisions and the bounded live computer-use demonstration.
 
 ## A — Spatial experience
 
