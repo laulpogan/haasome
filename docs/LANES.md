@@ -5,9 +5,12 @@ Codex workers now occupy A, B, and C in isolated worktrees. Human teammates shou
 coordinate before taking the same write scope. Two read-only scouts support asset
 licensing and GPU readiness; they do not create additional product lanes.
 
-Use ChatGPT Web High for these bounded Codex tasks to conserve Astra credits.
-No worker may recursively spawn more workers or start paid API jobs. Keep Astra
-for coordinator decisions and the bounded live computer-use demonstration.
+Prefer ChatGPT Web High for bounded Codex tasks to conserve Astra credits. The
+initial read-only scouts completed, but writer tool calls failed with expired
+tokens / bridge 502s. Two bounded Astra workers at medium reasoning now handle A
+and B; coordinator handles the small C exporter. No worker may recursively spawn
+more workers or start paid API jobs. Recheck healthy low-cost routing before
+expanding the pool; failed worker launches do not count as implementation progress.
 
 ## A — Spatial experience
 

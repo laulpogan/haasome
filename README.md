@@ -32,9 +32,10 @@ git worktree add ../haasome-scene -b lane/scene origin/setup/memory-palace
 git worktree add ../haasome-memory -b lane/memory origin/setup/memory-palace
 ```
 
-The repository has no default-branch commit yet. Start from the published setup
-branch. Each lane pushes its own branch; coordinator assembles an integration
-branch after inspecting changes. Merge to default only when requested.
+GitHub selected `setup/memory-palace` as the initial default branch when this empty
+repository received its first push. Start from that published scaffold. Each lane
+pushes its own branch; coordinator assembles `integration/first-palace` after
+inspecting changes. Merge to default only when requested.
 
 No raw personal media, screenshots, room scans, credentials, or model weights in
 Git. Use ignored `data/` and `artifacts/`. Fixture files are synthetic and explicitly
