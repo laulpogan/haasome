@@ -48,6 +48,14 @@ fresh-process reopen without original bundle requests and identical capsule
 re-download. Coordinator also verified device reload and inspected the settled
 courtyard. Full source, asset hashes and evidence paths: [museum handoff](FALLBACK-DEMO.md).
 
+Release replay at `2f2b1ac` passed on port 4193 on September 8: all three
+surface targets, recall, freeze, fresh-process reopen, identical re-download,
+mobile width and zero browser/network errors. A separate save/reload check restored
+all three places and the hand note without page errors. The reopened courtyard
+image was inspected. Local evidence: `artifacts/fallback/proof/verification.json`
+and `device-reload.json`; large capsules and screenshots remain ignored.
+The 1.7-minute automated test duration is not spoken presentation timing.
+
 ## Fallback order
 
 1. Current release viewer with its prepared public bundle.
