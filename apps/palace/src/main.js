@@ -4,6 +4,7 @@ import { SparkRenderer, SplatMesh, SplatFileType } from '@sparkjsdev/spark';
 import { assetPath, validateScene, validateMemories, validatePalace, defaultAnchors, completeAnchors, resolveAsset } from './contract.js';
 import { freezeCapsule, unpackCapsule } from './capsule.js';
 import { saveLocal, loadLocal } from './storage.js';
+import { decodeSelectedMedia } from './media.js';
 import './style.css';
 
 const $ = (id) => document.getElementById(id);
@@ -13,7 +14,7 @@ const notice = (message) => { $('notice').textContent = message; };
 let palace = {schemaVersion:0,scene:null,anchors:defaultAnchors(),memories:[]};
 let assets = new Map(), selected = palace.anchors[0].id, activeMemory = null, recall = null;
 let renderer, controls, mesh, loadGeneration = 0;
-let mediaUrls = [], pins = [], sceneReady = false;
+let mediaUrls = [], pins = [], sceneReady = false, creatingMemory = false;
 const world = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(60,1,0.01,10000);
 const room = $('room');
@@ -71,6 +72,8 @@ function renderUI() {
   $('capsule-status').textContent = frozen() ? `Frozen ${palace.capsule.frozenAt} · Read-only snapshot` : 'Editable draft';
   $('editable').hidden = !frozen();
   $('empty-import').disabled = frozen();
+  for (const el of $('memory-form').elements) el.disabled = frozen() || creatingMemory;
+  $('add-memory').querySelector('summary').textContent = frozen() ? 'Add memory (make editable copy first)' : 'Add photo or video memory';
   $('placement').querySelector('summary').textContent = frozen() ? 'Place coordinates (read-only)' : 'Edit this place';
   $('empty').querySelector('small').textContent = frozen() ? 'No scene is loaded. This snapshot is read-only.' : 'No scene is loaded. Anchor positions are editable starting points.';
   $('freeze').textContent = frozen() ? 'Download frozen capsule' : 'Freeze capsule';
@@ -97,7 +100,7 @@ function renderUI() {
     }
   }
   const memories = a.memoryIds.map(id => palace.memories.find(m => m.id === id));
-  if (!memories.length) { card.append(node('h2',a.label),node('p', frozen() ? 'No memory was saved at this place. Visit another place to recall its story.' : 'A place waiting for a story. Select this place, then import memories.json and its evidence files.'),node('small', frozen() ? 'Make an editable copy to add memories or change places.' : 'Five places are starting points. Rename and position them on objects in your room.')); return; }
+  if (!memories.length) { card.append(node('h2',a.label),node('p', frozen() ? 'No memory was saved at this place. Visit another place to recall its story.' : 'A place waiting for a story. Add a photo or video above, or import memories.json and its evidence files.'),node('small', frozen() ? 'Make an editable copy to add memories or change places.' : 'Five places are starting points. Rename and position them on objects in your room.')); return; }
   const m = memories.find(x => x.id === activeMemory) || memories[0]; activeMemory = m.id;
   if (memories.length > 1) {
     const picker = node('select'); picker.className = 'memory-picker'; picker.setAttribute('aria-label','Memory at this place');
@@ -106,7 +109,7 @@ function renderUI() {
   card.append(node('small',a.label),node('h2',m.title),node('p',m.body,'body'));
   for (const media of m.media) showAsset(card,media.asset,media.kind,media.alt);
   const source = node('section',null,'source');
-  const kind = {fixture:'Fixture — synthetic content',manual:'Manual import', 'computer-use':'Computer-use record — capture claimed by producer'}[m.source.kind];
+  const kind = {fixture:'Fixture — synthetic content',manual:'Manual selected media / import — no computer-use capture', 'computer-use':'Computer-use record — capture claimed by producer'}[m.source.kind];
   source.append(node('strong',kind),node('p',m.source.app),node('p',m.source.locator),node('p',`Source captured: ${m.source.capturedAt}`));
   if (m.source.evidenceAsset) {
     source.append(node('p', resolveAsset(assets,m.source.evidenceAsset) ? 'Saved evidence supplied — source truth not independently verified.' : 'Evidence referenced but missing.'));
@@ -119,6 +122,27 @@ function renderUI() {
   }
   else source.append(node('p','No source evidence supplied.'));
   card.append(source);
+  const editor = node('details'); editor.id = 'memory-editor';
+  editor.append(node('summary',frozen() ? 'Edit memory (make editable copy first)' : 'Edit memory text'));
+  const form = node('form'); form.append(node('p','Edit your title, body and cue. Original source, evidence and media stay unchanged.'));
+  for (const key of ['title','body','cue']) {
+    const label = node('label',key === 'cue' ? 'Recall cue' : key[0].toUpperCase()+key.slice(1));
+    const input = node(key === 'body' ? 'textarea' : 'input'); input.name = key; input.value = m[key]; input.required = true; input.disabled = frozen();
+    if (key === 'body') input.rows = 3;
+    label.append(input); form.append(label);
+  }
+  const update = node('button','Update memory'); update.disabled = frozen(); form.append(update);
+  form.onsubmit = event => {
+    event.preventDefault();
+    try {
+      requireEditable();
+      if (!palace.memories.includes(m)) throw new Error('Memory changed. Reopen its editor.');
+      const changes = Object.fromEntries(['title','body','cue'].map(key => [key,form.elements.namedItem(key).value.trim()]));
+      validateMemories([{...m,...changes}]);
+      Object.assign(m,changes); renderUI(); notice('Memory text updated. Source and evidence unchanged. Save on this device to keep it.');
+    } catch (error) { notice(`Edit rejected: ${error.message}`); }
+  };
+  editor.append(form); card.append(editor);
   const label = node('label','Move memory to'); const picker = node('select'); picker.setAttribute('aria-label','Move memory to');
   palace.anchors.forEach(x => { const option = node('option',x.label); option.value = x.id; picker.append(option); }); picker.value = a.id;
   picker.disabled = frozen();
@@ -215,6 +239,31 @@ async function importFiles(files) {
 for (const [trigger,input] of [['folder','folder-input'],['empty-import','folder-input'],['files','file-input']]) $(trigger).onclick = () => $(input).click();
 for (const id of ['folder-input','file-input']) $(id).onchange = async (event) => {
   try { await importFiles([...event.target.files]); } catch (error) { notice(`Import rejected: ${error.message}`); } finally { event.target.value = ''; }
+};
+$('memory-form').onsubmit = async event => {
+  event.preventDefault();
+  const submit = $('create-memory');
+  if (creatingMemory) return;
+  try {
+    requireEditable();
+    const current = palace, anchorId = selected;
+    const file = $('memory-media').files[0];
+    const fields = Object.fromEntries(['title','body','cue'].map(key => [key,$(`memory-${key}`).value.trim()]));
+    if (Object.values(fields).some(value => !value)) throw new Error('Title, body and recall cue are required.');
+    creatingMemory = true; submit.disabled = true; notice('Checking selected media…');
+    const {kind,blob} = await decodeSelectedMedia(file);
+    requireEditable();
+    if (palace !== current) throw new Error('Palace changed while checking media. Select the file again.');
+    const id = crypto.randomUUID(), path = `media/${id}/${kind}`;
+    const memory = {id,...fields,media:[{kind,asset:path,alt:fields.title}],source:{kind:'manual',app:'Local file picker',locator:`Manually selected file: ${file.name}`,capturedAt:new Date().toISOString(),evidenceAsset:null}};
+    validateMemories([memory]);
+    assets.set(path,blob); palace.memories.push(memory);
+    palace.anchors.find(a => a.id === anchorId).memoryIds.push(id);
+    selected = anchorId; activeMemory = id; recall = null;
+    $('memory-form').reset(); $('add-memory').open = false;
+    renderUI(); notice('Manual selected media added. No computer-use capture. Save on this device or freeze to keep it.');
+  } catch (error) { notice(`Memory rejected: ${error.message}`); }
+  finally { creatingMemory = false; for (const el of $('memory-form').elements) el.disabled = frozen(); }
 };
 $('home').onclick = home;
 $('place-form').onsubmit = (event) => {
