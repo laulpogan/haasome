@@ -1,7 +1,9 @@
 # Main demo: Fragments of an Emperor
 
 Use `release/museum-demo`. Start at `http://127.0.0.1:4193/?tour=capitoline` after
-the README setup. The worker's existing port 4189 remains a tested local backup.
+the README setup. For the library introduction, start at `?gallery` and Explore
+Constantine; four other entries are proposals. The worker's existing port 4189
+remains a tested local backup.
 Preload the courtyard and wait until the actual scene appears; decode-ready text
 can precede the first sorted GPU frame.
 
@@ -55,6 +57,12 @@ all three places and the hand note without page errors. The reopened courtyard
 image was inspected. Local evidence: `artifacts/fallback/proof/verification.json`
 and `device-reload.json`; large capsules and screenshots remain ignored.
 The 1.7-minute automated test duration is not spoken presentation timing.
+
+Integrated gallery replay at `e350cb0` also passed on port 4193 (51.1 seconds):
+no scene/WebGL on gallery entry, three surface selections, recall, freeze, fresh
+reopen, gallery return and saved-palace restore; zero console/network errors.
+The gallery was also opened and inspected in native Chrome through computer use.
+This launch does not establish computer-use collection of museum notes.
 
 ## Fallback order
 

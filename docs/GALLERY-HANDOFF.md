@@ -5,8 +5,9 @@
 Haasome is a library of explorable Gaussian-splat places. Each place has a small
 set of objects, source-backed notes or selected memories, and a recall/revisit loop.
 **Fragments of an Emperor is the first ready entry.** Keep that experience working
-while adding others. The next UI milestone is a gallery that opens these experiences.
-The gallery itself is not implemented in this handoff.
+while adding others. The gallery opens this experience at `?gallery`, with four
+labeled proposals.
+Only Constantine is playable. Direct tour URLs and saved-palace import still work.
 
 Start from **`origin/release/museum-demo`**, in an owned branch/worktree. Do not
 start from the old default `setup/memory-palace`; it is an early scaffold. Do not
@@ -77,24 +78,26 @@ Then guide me through the existing Constantine viewer and record only what I
 actually observed. Commit and push my owned document on a new branch; do not merge.
 ```
 
-### Coordinator or one frontend writer: gallery
+### Coordinator or one frontend writer: gallery maintenance
 
-Own `apps/palace/` in a separate branch. Reuse this viewer and capsule importer.
-Implement one gallery page with the ready Constantine card and clearly separated
-candidate proposals. Clicking Explore opens the existing tour. Add a visible return
-to gallery. Preserve direct tour URLs, saved local capsules and file import.
+Implemented by `fce229c`, integrated as `e350cb0`. Own `apps/palace/` in a separate
+branch for follow-up work. The ready Constantine card opens the existing tour;
+candidate cards expand proposals. The viewer has a return-to-gallery link.
+Preserve direct tour URLs, saved local capsules and file import.
 Do not load every scene on gallery entry. Use small permitted thumbnails and fetch
 only the chosen scene. Keep empty/offline/missing-asset states clear.
 
-Move tour selection out of the single hard-coded Constantine dispatch into a small
-local catalog only when the gallery consumes it. Keep each tour's existing palace
+The gallery and viewer now consume `src/catalog.js`; only Ready entries dispatch
+a tour. Keep each tour's existing palace
 bundle, hash, provenance, regions and source notes together. No new backend,
 accounts, model service or dependency is needed for this milestone.
 
-Finish line: gallery → Constantine → actual surface selection → recall → freeze
+Verified worker finish line: gallery → Constantine → actual surface selection → recall → freeze
 → fresh reopen → return to gallery, observed in the production build. Candidate
 cards cannot launch missing assets. Verify console, required requests and a phone
-layout. Push a reviewed unit; preserve the current tour as a regression case.
+layout. Preserve the current tour as a regression case. Worker production replay passed
+in 40.7 seconds with no console/network errors, including saved-palace restoration;
+desktop and phone screenshots were inspected. This is automated verification.
 
 ### Next scene owner: one public tour
 

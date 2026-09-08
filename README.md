@@ -21,7 +21,8 @@ npm run build
 npm run preview -- --port 4193
 ```
 
-Open **http://127.0.0.1:4193/?tour=capitoline**. The preparation script fetches and
+Open **http://127.0.0.1:4193/?gallery**, then choose **Explore**. Direct tour:
+**http://127.0.0.1:4193/?tour=capitoline**. The preparation script fetches and
 verifies the licensed 72 MB scene; GPU training and credentials are not needed.
 The tour URL starts a new public draft. Use the base URL without the query to
 restore device storage or import a frozen capsule.
@@ -42,12 +43,13 @@ picking, source notes and guided close views. Free navigation can expose scan ga
 use the verified stops for the presentation. Source websites require internet,
 but saved notes and scene travel inside the capsule.
 
-## Next: a gallery of splat experiences
+## A gallery of splat experiences
 
 Read [the gallery handoff](docs/GALLERY-HANDOFF.md) for ready/candidate labels,
 similar concepts, beginner-friendly prompts and file ownership. Constantine is the
-first ready entry; the gallery and additional tours are the next work, not shipped
-capabilities.
+first ready entry. The gallery is live with four labeled proposals; additional
+playable tours remain future work. Gallery entry loads no scene bytes and leaves
+saved palaces untouched. Use **Gallery** in the viewer to return.
 
 ## Collaboration and preserved work
 
