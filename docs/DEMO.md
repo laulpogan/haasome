@@ -83,7 +83,7 @@ state that this is the saved chapter in a flat view. It does not demonstrate spl
 or object recognition. Keep this file private; it embeds personal media.
 
 Coordinator replay on the production museum viewer also passed two consecutive
-head/hand/foot → recall/reveal action runs (3.391s and 5.527s, without narration),
+head/hand/foot → recall/reveal action runs (2.219s and 2.425s, without narration),
 then saved and reopened the tour from device storage at the base URL. No console,
-page or required HTTP errors occurred. These automation durations are not stage
-rehearsal times. Local proof: `artifacts/rehearsal/curated-rehearsal.json` and PNG.
+page or required HTTP errors occurred. The settled reload screenshot was inspected after allowing the first sorted GPU
+frame to appear. These automation durations are not stage rehearsal times. Local proof: `artifacts/rehearsal/curated-rehearsal.json` and PNG.
