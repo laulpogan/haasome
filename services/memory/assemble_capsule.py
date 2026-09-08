@@ -108,9 +108,11 @@ def assemble(scene_path, memory_paths, title, output):
     require(3 <= len(memories) <= 5, "Supply 3–5 existing memories; no records are invented or dropped")
     require(len({m["id"] for m in memories}) == len(memories), "Duplicate memory ID; originals must have unique IDs")
     center = scene["camera"]["target"]
+    spacing = math.dist(scene["camera"]["position"], center) * 0.2
     anchors = []
     for index in range(5):
-        position = [center[0] + (index - 2) * 0.7, center[1], center[2] + abs(index - 2) * 0.21]
+        position = [center[0] + (index - 2) * spacing, center[1],
+                    center[2] + abs(index - 2) * spacing * 0.3]
         require(vector(position, 3), "Anchor position exceeds finite coordinates")
         anchors.append({
             "id": f"place-{index + 1}",
