@@ -10,35 +10,28 @@ Working name: Haasome / Memory Palace. Browser-first is the proposed delivery
 surface because all three teammates need a common viewer. Native mobile and
 virtual reality are outside this seven-hour slice.
 
-## First story after Pro iteration
+## Current story: a frozen chapter
 
-"Remember the fix."
+Recover a bounded chapter through Photos and WhatsApp, retaining the source image,
+chat evidence, dates, and uncertainty. The presenter authorized both apps for this
+trial. A shared date can suggest a connection; it cannot establish attendance or
+photo location. Keep contrary evidence in the capsule.
 
-Recover a useful technical lesson from a public issue or documentation through its
-app UI. A candidate is a splat-import problem in GitHub: distinguish an outdated
-workaround from the documented requirement, retaining evidence. Source selection
-and actual capture are still unverified; do not invent a resolved issue.
+Three source-backed records occupy three of five anchors in a licensed sample
+room. Freeze the scene and referenced assets into one portable JSON file. Reopen
+it, visit an anchor, and reveal the saved evidence. This demonstrates a recall
+interaction, not improved human memory or clinical benefit.
 
-Use five loci for prerequisite, symptom, cause, correction, and verification.
-These are deliberate mnemonic associations, not claims that the room represents
-the software. Capture the source first, then show a labeled trace excerpt and the
-source-backed memory during the stage demo. Live extraction is outside the fixed
-90-second presentation path until its duration is measured.
-
-Fallback: a five-step workflow from one public documentation page. A hand-authored
-lesson proves the spatial interaction only. Nostalgia becomes the next story once
-the presenter selects personal media and provides a room capture. This demonstrates
-a recall interaction; it does not establish improved human memory or clinical benefit.
-
-The earlier engineering/legacy-app suggestions are context, not selected integrations.
-A dense app is worthwhile only if it supplies a detail the presenter wants to remember.
-Do not install a new engineering suite merely to produce a complex screen.
+The public technical lesson remains an alternative story. The parallel
+reconstruction session owns fresh room training; this capsule uses the existing
+licensed room until a new export passes viewer inspection. See
+[the capsule plan](docs/CAPSULE-PLAN.md) for current scope and delivery.
 
 ## Essential slice
 
 - One real Gaussian-splat room, with a clear label for the licensed sample.
 - Five stable spatial anchors, each opening text, a selected image, or a short clip.
-- One new memory from actual computer use in one allowed source app.
+- Three records from actual computer use in the two selected source apps.
 - Visible provenance and an editable placement; model suggestion is not fact.
 - A saved palace that survives reload on the demo machine.
 - One cue → visit anchor → reveal source loop.
@@ -48,7 +41,7 @@ Do not install a new engineering suite merely to produce a complex screen.
 - A teammate can provide a deliberate room capture or an existing licensed splat.
 - A working signed-in computer-use surface is available; "Astra 6" does not by
   itself establish an API name, credential, SDK, or hackathon requirement.
-- One public source app has a meaningful technical detail we can capture and verify.
+- The selected source apps contain a bounded chapter with evidence worth preserving.
 - Available GPU hosts have a compatible existing environment and free capacity.
 - All timings below are timeboxes, not measured training or inference speeds.
 
@@ -56,7 +49,7 @@ Do not install a new engineering suite merely to produce a complex screen.
 
 No automatic reconstruction from unrelated camera-roll images; no whole-house
 generation, automatic semantic segmentation, face recognition, voice cloning,
-multi-app federation, agent-written changes to source apps, or multi-GPU training.
+whole-computer federation, agent-written changes to source apps, or multi-GPU training.
 No invented biography or synthesized people. Memory content remains separate from
 scene geometry so a new splat does not require rebuilding the ingestion flow.
 

@@ -51,3 +51,40 @@ exporter attestation alone is not proof. Connections are qualified in memory tex
 do not infer identities from faces, sensitive traits, or attendance from proximity.
 The trial demonstrates this session's computer use; it does not imply a separate
 autonomous capture daemon or an installed Astra API integration.
+
+## Delivered trial
+
+Branch: `capsule/integration`. Start from `apps/palace`:
+
+```sh
+npm ci
+npm run build
+npm run preview -- --port 4185
+```
+
+Local inputs: `artifacts/capture/` (selected Photos exports and WhatsApp screenshots).
+Assembler output: `artifacts/capsules/july17-final/`.
+Portable output: `artifacts/capsules/july17-frozen.json` (about 41 MB).
+Open http://127.0.0.1:4185 and import that one file. Source assets remain on this
+Mac; neither the capsule nor the captures are committed or uploaded.
+
+Observed: real room splats, three real-source cards and decodable evidence;
+freeze/download; fresh-browser reopen; matching hashes for all five embedded
+assets; cue/visit/reveal; save and reload. Room load reported 0.71 seconds in one
+local Chromium run; this is not a performance benchmark. Build, six validator
+checks, eleven packaging checks and four browser tests pass. The private live
+verification and rendered evidence are under `artifacts/capsules/`.
+
+The exported photo had no GPS metadata. The trial preserves a temporal candidate
+and contrary message evidence instead of asserting a location or attendance.
+The selected photo export itself is its source evidence; WhatsApp records retain
+UI screenshots. Langfuse was not inspected. Marble packaging supports supplied
+exports, but no Marble export was used in this live trial.
+
+The user-visible Chrome viewer opened. Automated file selection was blocked by
+the extension's file-URL permission; the file was tested through the same importer
+in isolated Chromium. The presenter can use Import files to open it by hand.
+
+The other session owns the remote reconstruction container. A read-only check
+found its training and export processes running; no jobs or drivers were changed.
+Fresh reconstruction is not a prerequisite for this capsule.
