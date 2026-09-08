@@ -164,10 +164,12 @@ Observed in the real Chrome/Spark viewer: candidate imported with a reported
 0.34s render load and recognizable room objects. Jagged people and the right-edge
 smear remain. The app froze a separate candidate capsule, whose embedded PLY hash
 matches the candidate. `artifacts/quality/native-10000/capsule.json` holds that
-snapshot with empty memory bindings. Fresh-tab reopen and three matched Spark
-views remain unverified: headless browser checks timed out and native file-picker
-control stalled. Do not describe the Nerfstudio comparisons as Spark comparisons
-or the candidate as the completed memory capsule.
+snapshot with empty memory bindings. Fresh-tab reopen passed in Chrome: the app
+reported "Capsule reopened with its saved assets" and a 0.24s render load; the room
+was visible. Keyboard navigation resolved the native file-picker stall. Three
+matched Spark views remain unverified after headless browser timeouts. Do not
+describe the Nerfstudio comparisons as Spark comparisons or the candidate as the
+completed memory capsule.
 
 The installed Splatfacto loss multiplies both target and prediction by each mask;
 its dataparser requires mask paths for all frames or none. No masked result is
