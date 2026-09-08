@@ -88,3 +88,24 @@ in isolated Chromium. The presenter can use Import files to open it by hand.
 The other session owns the remote reconstruction container. A read-only check
 found its training and export processes running; no jobs or drivers were changed.
 Fresh reconstruction is not a prerequisite for this capsule.
+
+## Chapter integration continuation
+
+The active chapter goal is running in an isolated `haasome-chapter` worktree on
+`integration/one-chapter`, based on `398e806`. The companion's checkout and frozen
+snapshot remain untouched. This checkout serves the built viewer on loopback port
+4186 while the companion's viewer remains on 4185.
+
+Reverification read the actual frozen snapshot, matched all five embedded assets
+against the assembly SHA256 manifest, and opened it in fresh isolated Chromium.
+All three records displayed decodable images/evidence. Cue, visit, reveal, save,
+and reload passed with zero console/page/HTTP errors. File import through complete
+local rendering took 2810 ms in this run; no capture or reconstruction is included.
+Evidence is retained locally in `artifacts/chapter-verification/`.
+
+The partner's public WhatsApp handoff was read from `1915dcf`. Its selected trip
+locator and exported media are still missing here. Native UI ownership is awaiting
+confirmation: direct agent messaging is disabled for this project. Do not search
+unrelated groups or infer permission from another session's apparent inactivity.
+No new personal-source discovery, Langfuse inspection, or chapter selection is
+claimed by this verification. The full chapter goal remains active.
