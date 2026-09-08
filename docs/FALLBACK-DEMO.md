@@ -6,8 +6,9 @@ read a museum-backed detail; revisit its object to reveal it during recall.
 This independent fallback uses public, manually curated material. It makes no
 personal-capture, automatic-recognition or improved-memory claim.
 
-Branch: `work/curated-spatial-demo`, based on `fd88405`. Adopt this branch's
-verified commit; main/default and other worktrees were not edited.
+Branch: `work/curated-spatial-demo`, based on `fd88405`. Implementation commit:
+`de44e3a`. The following evidence commit changes only the test and this handoff.
+Main/default and other worktrees were not edited.
 
 ## Decision
 
@@ -124,7 +125,30 @@ Artifact root: `/Users/laul_pogan/Source/haasome-fallback/artifacts/fallback/`.
   `proof/04-fresh-browser-reopen.png`, `proof/05-mobile.png`.
 - Machine-readable observed outcomes: `proof/verification.json`.
 
-Final verification outcome is recorded below after the production browser run.
+Observed on the production build on 2026-09-08, at 20:47 UTC:
+
+- Six contract/unit tests passed; Vite production build passed. Its existing large
+  JavaScript bundle warning remains.
+- The real-scene Playwright test passed in 3.3 minutes. Head, hand and foot were
+  selected by canvas clicks through Spark raycasting, with the correct note and
+  region highlight. A bare-wall click selected no object.
+- Recall hid the detail, required visiting the hand and then revealed the note.
+- Freeze included exactly four assets: the 72,114,959-byte SOG and three reading
+  notes. A fresh Chromium process imported the single file with requests to the
+  original bundle blocked. All three surface clicks still worked.
+- Re-downloading from that fresh browser produced a byte-identical capsule.
+  Capsule size: 96,162,004 bytes; SHA-256:
+  `b14f2ddf2e82d001d23365060d4d93e41a0c96875fb4d8a7d9b4119ab924eeab`.
+- Frozen controls were disabled; device save succeeded. A 390px viewport had no
+  horizontal document overflow. Desktop and mobile screenshots were inspected.
+- Console errors: **0**. Failed requests: **0**. Original-bundle requests during
+  fresh-browser import: **0**. No native browser or foreground app was used.
+
+The first broad run timed out after fresh-browser round-trip and device save,
+while reaching an extra reload check under severe host contention. The final
+bounded test uses raw file hashes instead of another 96 MB JSON comparison and
+omits that extra reload. Device reload is **not verified in this run**; portable
+reopen is verified. No application change was needed after the visual check.
 
 ## Boundaries
 
