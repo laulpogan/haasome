@@ -1,0 +1,60 @@
+{
+  "source": "https://superspl.at/scene/5ab604fa",
+  "creator": "artfletch",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "gaussians": 4998324,
+  "bytes": 72114959,
+  "sha256": "b58988bd19ff2001b69b9454e5c069c99b6b5db964b1b5ab2b85359ccd57f6dc",
+  "modification": "Original published SOG components repackaged in deterministic ZIP; no retraining or geometry edits.",
+  "components": [
+    {
+      "file": "means_l.webp",
+      "url": "https://d28zzqy0iyovbz.cloudfront.net/5ab604fa/v1/means_l.webp",
+      "bytes": 13977330,
+      "sha256": "de6ea0f36a4c1bf25372bdd203c0cfa8f2c1ad8b17c10ca41a3f41cfd776c9cd"
+    },
+    {
+      "file": "means_u.webp",
+      "url": "https://d28zzqy0iyovbz.cloudfront.net/5ab604fa/v1/means_u.webp",
+      "bytes": 1887788,
+      "sha256": "4d32f68e8bc8171391c1eace942b611542c6bb3f4b1a1eda8a3fe09195c19760"
+    },
+    {
+      "file": "meta.json",
+      "url": "https://d28zzqy0iyovbz.cloudfront.net/5ab604fa/v1/meta.json",
+      "bytes": 15575,
+      "sha256": "67736dbdd265eefad7a7865659f89d794c352c8c1d740782d0d8ab1e4e210997"
+    },
+    {
+      "file": "quats.webp",
+      "url": "https://d28zzqy0iyovbz.cloudfront.net/5ab604fa/v1/quats.webp",
+      "bytes": 16260106,
+      "sha256": "83e5e2ff8a89dabd5448f239e839ac2e518ead313bf3fec1772f56e74aa5452f"
+    },
+    {
+      "file": "scales.webp",
+      "url": "https://d28zzqy0iyovbz.cloudfront.net/5ab604fa/v1/scales.webp",
+      "bytes": 14214262,
+      "sha256": "b6968735aaafbf46140d36b9022fd506b4657917f94858f5d1fb1fa55ebb0980"
+    },
+    {
+      "file": "sh0.webp",
+      "url": "https://d28zzqy0iyovbz.cloudfront.net/5ab604fa/v1/sh0.webp",
+      "bytes": 15252492,
+      "sha256": "c597283e54b4cde818c44660a524a6dc3e77afaea7c5af156988bab4f5d117ee"
+    },
+    {
+      "file": "shN_centroids.webp",
+      "url": "https://d28zzqy0iyovbz.cloudfront.net/5ab604fa/v1/shN_centroids.webp",
+      "bytes": 2077796,
+      "sha256": "32060f18628babf3bf84a4beea1515ae7be9a35f4a62f36f47e093fffaeb8b47"
+    },
+    {
+      "file": "shN_labels.webp",
+      "url": "https://d28zzqy0iyovbz.cloudfront.net/5ab604fa/v1/shN_labels.webp",
+      "bytes": 8428790,
+      "sha256": "87d3c70773eaaecc2aecf25d1bb69bbe84a6183a7e4367d813081c7abab077b1"
+    }
+  ]
+}

@@ -1,0 +1,207 @@
+{
+  "schemaVersion": 0,
+  "scene": {
+    "id": "capitoline-5ab604fa-v1",
+    "asset": "capitoline.sog",
+    "format": "sog",
+    "provenance": {
+      "kind": "licensed-sample",
+      "attribution": "Capitoline Museum Courtyard by artfletch \u2014 CC BY 4.0. https://superspl.at/scene/5ab604fa . Modern scan, February 2026; 987 Sony a7R V photographs processed with RealityScan and Postshot. Repackaged as SOG ZIP; geometry unchanged. License: https://creativecommons.org/licenses/by/4.0/ . Display rotated 180\u00b0 around X for Spark. Museum visitors are not identified. This is today\u2019s courtyard, not ancient Rome. No museum endorsement."
+    },
+    "transform": {
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "scale": 1
+    },
+    "camera": {
+      "position": [
+        0,
+        3.5,
+        -2
+      ],
+      "target": [
+        2.6,
+        3.1,
+        7.6
+      ]
+    }
+  },
+  "anchors": [
+    {
+      "id": "head",
+      "label": "The face of Constantine",
+      "position": [
+        6.9,
+        4.1,
+        8
+      ],
+      "memoryIds": [
+        "head-note"
+      ]
+    },
+    {
+      "id": "hand",
+      "label": "The restored hand",
+      "position": [
+        4,
+        2.95,
+        8
+      ],
+      "memoryIds": [
+        "hand-note"
+      ]
+    },
+    {
+      "id": "foot",
+      "label": "The colossal foot",
+      "position": [
+        -1.55,
+        2.45,
+        7.2
+      ],
+      "memoryIds": [
+        "foot-note"
+      ]
+    }
+  ],
+  "memories": [
+    {
+      "id": "head-note",
+      "title": "A face built for power",
+      "body": "The museum identifies this marble portrait as Constantine the Great. Its square face, large open eyes and distinctive fringe belong to an official imperial image. The catalog dates the head to 313\u2013324 CE and records its height as 260 cm.\n\nFound in the Basilica of Maxentius, the head survives apart from the colossal seated body. Read the face as a public image of power, not a candid likeness.",
+      "cue": "Find the face. Which emperor does the museum identify, and how tall is the surviving head?",
+      "media": [],
+      "source": {
+        "kind": "manual",
+        "app": "Musei Capitolini \u00b7 official collection catalog",
+        "locator": "https://museicapitolini.org/en/opera/statua-colossale-di-costantino-testa",
+        "capturedAt": "2026-09-08T20:10:00Z",
+        "evidenceAsset": "head-reading-note.txt"
+      }
+    },
+    {
+      "id": "hand-note",
+      "title": "The finger is a later addition",
+      "body": "The raised index finger is a modern addition to an ancient fragment. The museum says the original hand probably held a sceptre. That \u201cprobably\u201d matters: the missing object is an interpretation.\n\nThe statue combined marble for exposed body parts with other materials for its clothed body. The seated pose evoked Jupiter. Remember the hand as a cue to separate surviving evidence from restoration.",
+      "cue": "Find the raised finger. Is it ancient or restored, and what did the hand probably hold?",
+      "media": [],
+      "source": {
+        "kind": "manual",
+        "app": "Musei Capitolini \u00b7 official collection catalog",
+        "locator": "https://www.museicapitolini.org/en/node/2695",
+        "capturedAt": "2026-09-08T20:10:00Z",
+        "evidenceAsset": "hand-reading-note.txt"
+      }
+    },
+    {
+      "id": "foot-note",
+      "title": "Barefoot, like a god",
+      "body": "The museum describes the feet as more than two metres long. Constantine wears neither boots nor sandals in this statue: bare feet helped present the emperor like a god.\n\nThe two feet preserve different poses. One heel rises while the other foot rests flat. Metal pins and bars held the statue\u2019s different materials together. This foot is a cue to reconstruct the seated body from surviving fragments.",
+      "cue": "Find the giant toes. Why was the emperor barefoot, and how long were the feet?",
+      "media": [],
+      "source": {
+        "kind": "manual",
+        "app": "Musei Capitolini \u00b7 official collection catalog",
+        "locator": "https://www.museicapitolini.org/en/node/1014233",
+        "capturedAt": "2026-09-08T20:10:00Z",
+        "evidenceAsset": "foot-reading-note.txt"
+      }
+    }
+  ],
+  "capsule": {
+    "id": "capitoline-fragments",
+    "title": "Fragments of an Emperor"
+  },
+  "curatedTour": {
+    "version": 1,
+    "title": "Fragments of an Emperor",
+    "subtitle": "Rome \u00b7 Three marble fragments tell a story of identity, restoration and power. Follow the stops, then test one detail through its object.",
+    "sceneSha256": "b58988bd19ff2001b69b9454e5c069c99b6b5db964b1b5ab2b85359ccd57f6dc",
+    "regions": [
+      {
+        "anchorId": "head",
+        "center": [
+          6.9,
+          -4.1,
+          -8
+        ],
+        "halfSize": [
+          0.85,
+          1.35,
+          0.7
+        ],
+        "camera": {
+          "position": [
+            4.5,
+            4.1,
+            2.5
+          ],
+          "target": [
+            6.9,
+            4.1,
+            8
+          ]
+        }
+      },
+      {
+        "anchorId": "hand",
+        "center": [
+          4,
+          -2.95,
+          -8
+        ],
+        "halfSize": [
+          0.62,
+          1.05,
+          0.7
+        ],
+        "camera": {
+          "position": [
+            3.3,
+            3.2,
+            2.5
+          ],
+          "target": [
+            4,
+            2.95,
+            8
+          ]
+        }
+      },
+      {
+        "anchorId": "foot",
+        "center": [
+          -1.55,
+          -2.45,
+          -7.2
+        ],
+        "halfSize": [
+          0.9,
+          0.7,
+          1.1
+        ],
+        "camera": {
+          "position": [
+            -0.7,
+            3.7,
+            1.5
+          ],
+          "target": [
+            -1.55,
+            2.45,
+            7.2
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -6,6 +6,7 @@ import { freezeCapsule, unpackCapsule, capsuleBlob } from './capsule.js';
 import { saveLocal, loadLocal } from './storage.js';
 import { decodeSelectedMedia } from './media.js';
 import { mountCapture } from './capture.js';
+import {readTour, verifyTourScene, regionAtPoint, projectRegion} from './curated.js';
 import './style.css';
 
 const $ = (id) => document.getElementById(id);
@@ -15,7 +16,7 @@ const notice = (message) => { $('notice').textContent = message; };
 let palace = {schemaVersion:0,scene:null,anchors:defaultAnchors(),memories:[]};
 let assets = new Map(), selected = palace.anchors[0].id, activeMemory = null, recall = null;
 let renderer, controls, mesh, loadGeneration = 0;
-let mediaUrls = [], pins = [], sceneReady = false, creatingMemory = false;
+let mediaUrls = [], pins = [], sceneReady = false, creatingMemory = false, tour = null;
 const world = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(60,1,0.01,10000);
 const room = $('room');
@@ -32,7 +33,13 @@ try {
   new ResizeObserver(resize).observe(room); resize();
   renderer.setAnimationLoop(() => {
     controls.update(); renderer.render(world,camera);
-    for (const {anchor,el} of pins) {
+    for (const {anchor,el,region} of pins) {
+      if (region) {
+        const bounds = sceneReady && mesh && projectRegion(region,mesh,camera,room.clientWidth,room.clientHeight);
+        el.hidden = !bounds;
+        if (bounds) for (const key of ['left','top','width','height']) el.style[key] = `${bounds[key]}px`;
+        continue;
+      }
       const p = new THREE.Vector3(...anchor.position).project(camera);
       el.hidden = !sceneReady || p.z < -1 || p.z > 1 || Math.abs(p.x)>1 || Math.abs(p.y)>1;
       el.style.left = `${(p.x+1)*room.clientWidth/2}px`; el.style.top = `${(1-p.y)*room.clientHeight/2}px`;
@@ -43,12 +50,17 @@ function home() {
   const pose = palace.scene?.camera || {position:[0,1.6,4],target:[0,1,0]};
   camera.position.fromArray(pose.position); controls?.target.fromArray(pose.target); controls?.update();
 }
-function selectAnchor(id) {
+function selectAnchor(id, focus = true) {
   selected = id; activeMemory = null;
   const anchor = palace.anchors.find(a => a.id === id);
-  if (sceneReady && controls) {
-    const offset = camera.position.clone().sub(controls.target);
-    controls.target.fromArray(anchor.position); camera.position.copy(controls.target).add(offset); controls.update();
+  if (sceneReady && controls && focus) {
+    const region = tour?.regions.find(r => r.anchorId === id);
+    if (region) {
+      camera.position.fromArray(region.camera.position); controls.target.fromArray(region.camera.target); controls.update();
+    } else {
+      const offset = camera.position.clone().sub(controls.target);
+      controls.target.fromArray(anchor.position); camera.position.copy(controls.target).add(offset); controls.update();
+    }
   }
   if (recall && anchor.memoryIds.includes(recall.memoryId)) recall.visited = true;
   renderUI();
@@ -68,6 +80,16 @@ function requireEditable() {
   if (frozen()) throw new Error('Frozen capsule is read-only. Make editable copy first.');
 }
 function renderUI() {
+  document.body.classList.toggle('curated',Boolean(tour));
+  $('places').setAttribute('aria-label',tour ? 'Exhibit objects' : 'Five places');
+  $('home').textContent = tour ? 'Courtyard view' : 'Room view';
+  $('scene-title').textContent = tour ? tour.title : (palace.scene ? 'Memory palace' : 'Give a memory a place.');
+  $('tour-intro').hidden = !tour;
+  $('tour-intro').textContent = tour ? tour.subtitle : '';
+  $('tour-binding').hidden = !tour;
+  $('tour-binding').textContent = tour ? 'Click the marble objects · Curator-placed regions · Scene bytes verified' : '';
+  if (tour) $('scene-kind').textContent = 'Modern museum scan · CC BY 4.0';
+  $('folio-label').textContent = tour ? 'Three fragments. One emperor.' : 'Memory folio';
   $('capsule-title').value = palace.capsule?.title || 'A moment to keep';
   $('capsule-title').disabled = frozen();
   $('capsule-status').textContent = frozen() ? `Frozen ${palace.capsule.frozenAt} · Read-only snapshot` : 'Editable draft';
@@ -81,9 +103,15 @@ function renderUI() {
   for (const el of $('place-form').elements) el.disabled = frozen();
   for (const url of mediaUrls) URL.revokeObjectURL(url); mediaUrls = [];
   $('places').replaceChildren(); $('pins').replaceChildren(); pins = [];
-  palace.anchors.forEach((a,i) => {
+  palace.anchors.filter(a => !tour || tour.regions.some(r => r.anchorId === a.id)).forEach((a,i) => {
     const b = button(a.label,() => selectAnchor(a.id)); b.setAttribute('aria-pressed',String(a.id === selected));
-    b.append(node('span',`${a.memoryIds.length} ${a.memoryIds.length === 1 ? 'memory' : 'memories'}`)); $('places').append(b);
+    b.append(node('span',tour ? `Stop ${i+1} · ${a.memoryIds.length} catalog note` : `${a.memoryIds.length} ${a.memoryIds.length === 1 ? 'memory' : 'memories'}`)); $('places').append(b);
+    if (tour) {
+      const region = tour.regions.find(r => r.anchorId === a.id);
+      const el = node('div',null,'object-region'); el.dataset.anchor = a.id; el.dataset.selected = String(a.id === selected && !recall);
+      el.setAttribute('aria-hidden','true'); el.append(node('span',`${i+1} · ${a.label}`));
+      $('pins').append(el); pins.push({anchor:a,el,region}); return;
+    }
     const pin = button('✦',() => selectAnchor(a.id)); pin.className = 'pin'; pin.setAttribute('aria-label',`Visit ${a.label}`); pin.setAttribute('aria-pressed',String(a.id === selected)); pin.hidden = true;
     $('pins').append(pin); pins.push({anchor:a,el:pin});
   });
@@ -110,10 +138,17 @@ function renderUI() {
   card.append(node('small',a.label),node('h2',m.title),node('p',m.body,'body'));
   for (const media of m.media) showAsset(card,media.asset,media.kind,media.alt);
   const source = node('section',null,'source');
-  const kind = {fixture:'Fixture — synthetic content',manual:'Manual selected media / import — no computer-use capture', 'computer-use':'Computer-use record — capture claimed by producer'}[m.source.kind];
-  source.append(node('strong',kind),node('p',m.source.app),node('p',m.source.locator),node('p',`Source captured: ${m.source.capturedAt}`));
+  const kind = tour ? 'Curated museum catalog note · manual import' : {fixture:'Fixture — synthetic content',manual:'Manual selected media / import — no computer-use capture', 'computer-use':'Computer-use record — capture claimed by producer'}[m.source.kind];
+  source.append(node('strong',kind),node('p',m.source.app));
+  try {
+    const url = new URL(m.source.locator);
+    if (!['https:','http:'].includes(url.protocol)) throw new Error('Unsupported source URL');
+    const link = node('a',tour ? 'Read the museum catalog ↗' : m.source.locator);
+    link.href = url.href; link.target = '_blank'; link.rel = 'noopener noreferrer'; source.append(link);
+  } catch { source.append(node('p',m.source.locator)); }
+  source.append(node('p',`${tour ? 'Source consulted' : 'Source captured'}: ${m.source.capturedAt}`));
   if (m.source.evidenceAsset) {
-    source.append(node('p', resolveAsset(assets,m.source.evidenceAsset) ? 'Saved evidence supplied — source truth not independently verified.' : 'Evidence referenced but missing.'));
+    source.append(node('p', resolveAsset(assets,m.source.evidenceAsset) ? (tour ? 'Saved reading note travels with this capsule. Original catalog remains at the source link.' : 'Saved evidence supplied — source truth not independently verified.') : 'Evidence referenced but missing.'));
     const blob = resolveAsset(assets,m.source.evidenceAsset);
     if (!blob || blob.type.startsWith('image/') || /\.(png|jpe?g|webp|gif)$/i.test(m.source.evidenceAsset)) showAsset(source,m.source.evidenceAsset,'image','Source evidence');
     else {
@@ -123,6 +158,14 @@ function renderUI() {
   }
   else source.append(node('p','No source evidence supplied.'));
   card.append(source);
+  if (tour) {
+    const index = tour.regions.findIndex(r => r.anchorId === a.id);
+    card.append(button(index < tour.regions.length-1 ? 'Next fragment →' : 'Return to the courtyard',() => {
+      if (index < tour.regions.length-1) selectAnchor(tour.regions[index+1].anchorId); else home();
+    }));
+    card.append(node('p','Look → read → recall. Begin recall hides the detail until you revisit its object.','tour-hint'));
+    return;
+  }
   const editor = node('details'); editor.id = 'memory-editor';
   editor.append(node('summary',frozen() ? 'Edit memory (make editable copy first)' : 'Edit memory text'));
   const form = node('form'); form.append(node('p','Edit your title, body and cue. Original source, evidence and media stay unchanged.'));
@@ -154,7 +197,7 @@ function renderUI() {
   }; label.append(picker); card.append(label);
 }
 async function loadScene() {
-  const generation = ++loadGeneration; sceneReady = false;
+  const generation = ++loadGeneration; sceneReady = false; tour = null; renderUI();
   if (mesh) { world.remove(mesh); mesh.dispose(); mesh = null; }
   $('empty').hidden = false; $('render-status').textContent = 'Waiting for a scene';
   home();
@@ -173,12 +216,15 @@ async function loadScene() {
   try {
     const bytes = new Uint8Array(await file.arrayBuffer());
     if (generation !== loadGeneration) return;
+    const requestedTour = readTour(palace);
+    if (requestedTour) await verifyTourScene(requestedTour,bytes);
+    if (generation !== loadGeneration) return;
     candidate = new SplatMesh({fileBytes:bytes,fileName:s.asset,fileType:s.format === 'sog' ? SplatFileType.PCSOGSZIP : s.format});
     await candidate.initialized;
     if (generation !== loadGeneration) { candidate.dispose(); return; }
     candidate.position.fromArray(s.transform.position); candidate.quaternion.fromArray(s.transform.rotation); candidate.scale.setScalar(s.transform.scale);
-    mesh = candidate; world.add(mesh); sceneReady = true; $('empty').hidden = true;
-    $('render-status').textContent = `Gaussian splats loaded · ${((performance.now()-start)/1000).toFixed(2)}s`;
+    mesh = candidate; world.add(mesh); mesh.updateMatrixWorld(true); sceneReady = true; tour = requestedTour; renderUI(); $('empty').hidden = true;
+    $('render-status').textContent = `Gaussian splats loaded · ${((performance.now()-start)/1000).toFixed(2)}s${tour ? ' · SHA-256 verified' : ''}`;
   } catch (error) {
     candidate?.dispose(); if (generation !== loadGeneration) return;
     $('empty').hidden = false; $('render-status').textContent = 'Scene could not load'; notice(`Scene could not load: ${error.message}. SOG must be a ZIP-packaged .sog, not meta.json alone.`);
@@ -202,6 +248,7 @@ async function importFiles(files) {
     if (files.length !== 1 || capsules.length !== 1) throw new Error('Import one capsule container by itself.');
     const container = capsules[0];
     const importedAssets = unpackCapsule(container);
+    readTour(container.palace);
     palace = structuredClone(container.palace); assets = importedAssets;
     selected = palace.anchors[0].id; activeMemory = null; recall = null;
     renderUI(); await loadScene(); notice('Capsule reopened with its saved assets.'); return;
@@ -214,7 +261,7 @@ async function importFiles(files) {
   if (full.length) {
     next = validatePalace(full[0]);
     if (next.capsule?.frozenAt) throw new Error('Reopen frozen snapshots using their portable capsule container.');
-    next = completeAnchors(next);
+    if (!readTour(next)) next = completeAnchors(next);
   }
   const scenes = documents.filter(x => !Array.isArray(x) && x.asset && x.camera);
   if (scenes.length > 1) throw new Error('Select only one scene.json at a time.');
@@ -231,8 +278,8 @@ async function importFiles(files) {
       if (!next.anchors.some(a => a.memoryIds.includes(m.id))) anchor.memoryIds.push(m.id);
     }
   }
-  validatePalace(next);
-  const sceneChanged = JSON.stringify(palace.scene) !== JSON.stringify(next.scene) || (next.scene && resolveAsset(assets,next.scene.asset) !== resolveAsset(nextAssets,next.scene.asset));
+  validatePalace(next); readTour(next);
+  const sceneChanged = JSON.stringify(palace.curatedTour) !== JSON.stringify(next.curatedTour) || JSON.stringify(palace.scene) !== JSON.stringify(next.scene) || (next.scene && resolveAsset(assets,next.scene.asset) !== resolveAsset(nextAssets,next.scene.asset));
   palace = next; assets = nextAssets; selected = anchor.id; activeMemory = null; recall = null;
   renderUI(); notice(`Imported ${files.length} files. ${palace.memories.length} memories. Save on this device to keep this bundle.`);
   if (sceneChanged) await loadScene();
@@ -319,7 +366,37 @@ $('editable').onclick = () => {
 };
 try {
   const stored = await loadLocal();
-  if (stored) { palace = validatePalace(stored.palace); if (!frozen()) completeAnchors(palace); assets = new Map(stored.assets); selected = palace.anchors[0].id; notice('Restored the saved palace and its local assets.'); }
+  if (stored) { palace = validatePalace(stored.palace); if (!frozen() && !readTour(palace)) completeAnchors(palace); assets = new Map(stored.assets); selected = palace.anchors[0].id; notice('Restored the saved palace and its local assets.'); }
 } catch (error) { notice(`Saved palace unavailable: ${error.message}. Reimport your bundle.`); }
+// The dedicated URL opens this public educational bundle without touching source apps.
+if (new URLSearchParams(location.search).get('tour') === 'capitoline') {
+  try {
+    const response = await fetch('/curated-court/palace.json');
+    if (!response.ok) throw new Error('Run the fallback preparation script to install the licensed bundle.');
+    const draft = await response.json(); validatePalace(draft); readTour(draft);
+    const paths = [draft.scene.asset,...new Set(draft.memories.map(m => m.source.evidenceAsset).filter(Boolean))];
+    const files = [new File([JSON.stringify(draft)],'palace.json',{type:'application/json'})];
+    for (const path of paths) {
+      assetPath(path); const asset = await fetch(`/curated-court/${path}`);
+      if (!asset.ok) throw new Error(`Missing exhibit asset: ${path}`);
+      files.push(new File([await asset.blob()],path,{type:path.endsWith('.txt') ? 'text/plain' : 'application/octet-stream'}));
+    }
+    // Explicit demo navigation starts a new draft; it does not overwrite device storage.
+    palace = {schemaVersion:0,scene:null,anchors:defaultAnchors(),memories:[]};
+    await importFiles(files);
+  } catch (error) { notice(`Exhibit unavailable: ${error.message}`); }
+}
+let pointerStart = null;
+renderer?.domElement.addEventListener('pointerdown',event => { pointerStart = [event.clientX,event.clientY,event.button]; });
+renderer?.domElement.addEventListener('pointerup',event => {
+  if (!tour || !mesh || !pointerStart || pointerStart[2] !== 0 || Math.hypot(event.clientX-pointerStart[0],event.clientY-pointerStart[1]) > 6) return;
+  pointerStart = null;
+  const rect = renderer.domElement.getBoundingClientRect(), ray = new THREE.Raycaster();
+  ray.setFromCamera(new THREE.Vector2((event.clientX-rect.left)/rect.width*2-1,1-(event.clientY-rect.top)/rect.height*2),camera);
+  const hit = ray.intersectObject(mesh,false)[0];
+  const region = hit && regionAtPoint(tour,mesh.worldToLocal(hit.point.clone()));
+  if (region) { selectAnchor(region.anchorId,false); notice('Object selected from the splat surface. Region placed by a curator, not automatic recognition.'); }
+  else notice('No curated object at this surface. Choose the head, hand or foot; the stop buttons also support keyboard navigation.');
+});
 mountCapture({importFiles, requireEditable, sceneReady:()=>sceneReady});
-renderUI(); await loadScene();
+renderUI(); if (!sceneReady) await loadScene();
