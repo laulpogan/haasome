@@ -42,7 +42,7 @@ def validate_scene(scene):
             "Unsupported scene format")
     provenance = scene.get("provenance", {})
     require(isinstance(provenance, dict) and provenance.get("kind") in
-            ("captured", "licensed-sample", "fixture") and text(provenance.get("attribution")),
+            ("captured", "licensed-sample", "fixture", "generated") and text(provenance.get("attribution")),
             "Scene provenance required")
     transform, camera = scene.get("transform", {}), scene.get("camera", {})
     require(isinstance(transform, dict) and isinstance(camera, dict), "Scene transform/camera required")

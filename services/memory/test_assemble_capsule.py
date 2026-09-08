@@ -52,6 +52,17 @@ class CapsuleTests(unittest.TestCase):
     def run_assembler(self):
         return assemble(self.scene, self.bundles, "Selected capsule", self.output)
 
+    def test_generated_scene_preserves_provenance(self):
+        self.scene_record["provenance"] = {
+            "kind": "generated", "attribution": "Synthetic generated-scene packaging test",
+            "description": "Generated scene; not a captured room",
+        }
+        self.write(self.scene, self.scene_record)
+        palace = json.loads(self.run_assembler().read_text())
+        self.assertEqual(palace["scene"]["provenance"], self.scene_record["provenance"])
+        self.assertEqual((self.output / palace["scene"]["asset"]).read_bytes(),
+                         (self.scene.parent / "same.ply").read_bytes())
+
     def test_cli_colliding_basenames_preserves_sources_and_inventory(self):
         before = {p: p.read_bytes() for p in self.root.rglob("*") if p.is_file()}
         command = [sys.executable, str(Path(__file__).with_name("assemble_capsule.py")),
