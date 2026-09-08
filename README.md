@@ -35,20 +35,20 @@ Selected personal artifacts stay outside this integration branch's tracked files
 
 ## Start here
 
-1. Read [the brief](PROJECT.md) and [three-lane plan](docs/LANES.md).
+1. Read [the current brief](PROJECT.md) and [active quality goals](docs/QUALITY-GOALS.md).
 2. Claim one lane with teammates before writing. Each lane gets its own clone or worktree.
 3. Read [the shared contract](packages/contracts/README.md).
 4. Continue from the integrated slice; finish the remaining live handoff before adding features.
 
 | Lane | Owns | Next handoff |
 | --- | --- | --- |
-| A — Spatial experience | `apps/palace/` | Rehearse the verified capsule; fix observed interaction issues |
-| B — Scene pipeline | `pipelines/scene/` | Assess capture quality; preserve the working scene |
-| C — App intelligence | `services/memory/` | Curate selected cards using the existing assembler |
+| A — Spatial experience | `apps/palace/` | Bind memories to confirmed objects/regions; verify persistence |
+| B — Scene pipeline | `pipelines/scene/` | Compare native-resolution reconstruction; preserve baseline |
+| C — App intelligence | `services/memory/` | Collect bounded, targeted missing views and source context |
 
 Shared contracts, root configuration, and integration belong to the coordinator.
 See [AGENTS.md](AGENTS.md) for write boundaries and Git rules.
-The [teammate prompts](docs/TEAMMATE-START.md) include a low-touch content lane.
+The [teammate prompts](docs/TEAMMATE-START.md) assign a low-touch rehearsal lane to sbardacosta-code.
 
 ```sh
 git fetch origin
@@ -61,7 +61,8 @@ git worktree add ../haasome-next-memory -b work/memory-yourname origin/integrati
 GitHub selected `setup/memory-palace` as the initial default branch when this empty
 repository received its first push. The latest assembled code is on
 `integration/one-chapter`; the initial `lane/*` branches preserve each producer's
-commit. Continue from integration in a fresh owned branch. Merge to default only
+commit. Polish coordination is on `integration/demo-polish`; active technical lanes start
+from `goals/quality-and-object-memory`. Continue in a fresh owned branch. Merge to default only
 when requested; nothing has been merged there.
 
 No raw personal media, screenshots, room scans, credentials, or model weights in

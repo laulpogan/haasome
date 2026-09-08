@@ -1,72 +1,56 @@
-# Project brief
+# Haasome: a place to remember
 
-## Outcome
+## Product and demonstration
 
-A person opens a reconstruction of a familiar room, visits objects that hold
-memories, and returns to a source-backed detail through a spatial cue. A computer-use
-agent gathers one useful detail from an existing app and helps place it in the room.
+Haasome turns a familiar place into a way back to selected memories. Open a room,
+visit a meaningful object, reveal its photo or clip and source, then freeze the
+chapter so it can be revisited. The seven-hour hackathon deliverable is one browser
+experience with one scene, five memories and a recall/reveal loop.
 
-Working name: Haasome / Memory Palace. Browser-first is the proposed delivery
-surface because all three teammates need a common viewer. Native mobile and
-virtual reality are outside this seven-hour slice.
+The current personal chapter is the presenter-selected Austin trip. A 16.95-second
+room video became a real Gaussian splat through the upload interface and prepared
+remote trainer. Five records contain three photos and two videos. One record retains
+observed computer-use evidence; four retain manual-import provenance. Source
+capture time is not necessarily the event time. Spatial placement is a mnemonic
+association unless evidence establishes where the event occurred.
 
-## Current story: a frozen chapter
+The existing frozen capsule supports playback, recall, save/reload and fresh reopen.
+It remains the functional baseline. Its room geometry is rough and its anchor
+positions do not establish object recognition. See the measured evidence in
+[pipeline results](pipelines/scene/RECONSTRUCTION.md) and
+[capsule results](docs/CAPSULE-PLAN.md).
 
-Recover a bounded chapter through Photos and WhatsApp, retaining the source image,
-chat evidence, dates, and uncertainty. The presenter authorized both apps for this
-trial. A shared date can suggest a connection; it cannot establish attendance or
-photo location. Keep contrary evidence in the capsule.
+## Current finish line
 
-Three source-backed records occupy three of five anchors in a licensed sample
-room. Freeze the scene and referenced assets into one portable JSON file. Reopen
-it, visit an anchor, and reveal the saved evidence. This demonstrates a recall
-interaction, not improved human memory or clinical benefit.
+Three active lanes improve [scene quality, object memory and targeted collection](docs/QUALITY-GOALS.md).
+The coordinator integrates their verified work on `integration/demo-polish`.
 
-The public technical lesson remains an alternative story. The parallel
-reconstruction session owns fresh room training; this capsule uses the existing
-licensed room until a new export passes viewer inspection. See
-[the capsule plan](docs/CAPSULE-PLAN.md) for current scope and delivery.
+- A recognizable scene that stays useful across the demonstrated camera views.
+- Memories bound to confirmed scene objects or regions, with preserved source facts.
+- Recognition distinguished from manual selection; scene changes invalidate old bindings.
+- A coherent chapter that survives freeze, fresh reopen and recall on the demo machine.
+- A rehearsed story whose claims match the running build and source evidence.
 
-## Essential slice
+Euler owns an independent curated educational fallback. Its selected concept and
+capabilities remain pending until inspected. A licensed or curated setting retains
+its label and cannot be presented as the personal room. The GitHub collaborator
+owns a beginner-friendly [rehearsal handoff](docs/TEAMMATE-START.md).
 
-- One real Gaussian-splat room, with a clear label for the licensed sample.
-- Five stable spatial anchors, each opening text, a selected image, or a short clip.
-- Three records from actual computer use in the two selected source apps.
-- Visible provenance and an editable placement; model suggestion is not fact.
-- A saved palace that survives reload on the demo machine.
-- One cue → visit anchor → reveal source loop.
+## Boundaries
 
-## Assumptions to test first
+Keep private media, room scans and app evidence outside Git. Collect only from
+presenter-selected sources. No source-app writes, invented biography, face identity
+inference, account system, headset work or whole-camera-roll ingestion. The recall
+interaction does not establish improved human memory or clinical benefit.
 
-- A teammate can provide a deliberate room capture or an existing licensed splat.
-- A working signed-in computer-use surface is available; "Astra 6" does not by
-  itself establish an API name, credential, SDK, or hackathon requirement.
-- The selected source apps contain a bounded chapter with evidence worth preserving.
-- Available GPU hosts have a compatible existing environment and free capacity.
-- All timings below are timeboxes, not measured training or inference speeds.
+Two RTX PRO 6000 hosts have completed training. Quality owns the Dell allocation;
+object work may use the second host after checking availability. Two DGX Sparks
+are available but need not be occupied. No distributed trainer or driver changes.
+Training speed on a prepared environment excludes cold installation and compilation.
 
-## Cuts
+## Coordination
 
-No automatic reconstruction from unrelated camera-roll images; no whole-house
-generation, automatic semantic segmentation, face recognition, voice cloning,
-whole-computer federation, agent-written changes to source apps, or multi-GPU training.
-No invented biography or synthesized people. Memory content remains separate from
-scene geometry so a new splat does not require rebuilding the ingestion flow.
-
-## Infrastructure allocation
-
-Reported resources: two DGX Sparks and two RTX Pro 6000 GPUs over Tailscale.
-Read-only checks on 2026-09-08 reached both GB10 hosts and one RTX PRO 6000 Blackwell
-Workstation Edition through established SSH aliases. The second reported RTX GPU
-has not been verified. No ready room-reconstruction stack was found on the checked
-hosts; the GB10 Python environments also emitted a CUDA architecture warning.
-
-Give B one compatible free RTX host for reconstruction; keep the other as a
-separate fallback, not distributed training. Use a Spark only if C already has a
-working compatible inference service and approved model. Leave spare machines idle
-when they do not shorten the critical path. The demo viewer must work without an
-SSH round trip for every camera movement.
-
-Use an existing licensed room splat for the first integrated slice. Fresh capture
-and environment setup remain a separate lane B milestone. No reconstruction timing
-or browser performance has been measured. See [feasibility](docs/FEASIBILITY.md).
+One writer per lane, separate branches/worktrees. Coordinator owns shared contracts,
+root documentation and integration. Keep the verified baseline and original assets.
+Do not merge the default branch without instruction. Current ownership is in
+[teammate handoffs](docs/TEAMMATE-START.md); `docs/LANES.md` records the initial allocation.

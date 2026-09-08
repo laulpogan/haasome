@@ -1,34 +1,44 @@
-# Demo and acceptance
+# Demo route and acceptance
 
-## Proposed 90-second story: Remember the fix
+## Current route: a place to remember
 
-1. 0–15s: pose one technical problem and enter the licensed room.
-2. 15–35s: show a labeled excerpt of a completed agent UI capture and its finding.
-3. 35–65s: walk five loci: prerequisite, symptom, cause, correction, verification.
-4. 65–90s: hide the cards, recall the consequential detail, and reveal its source.
+Use the approved Austin capsule as the functional baseline. The quality and object
+lanes are still improving it; choose the final scene only after a rendered comparison
+and a complete capsule rehearsal. The collaborator drafts the spoken script in
+[issue #1](https://github.com/laulpogan/haasome/issues/1).
 
-These are presentation allocations, not execution-speed claims. Capture and verify
-the technical lesson before the stage demo. If only manual content exists, label
-the demonstration as a spatial lesson; do not substitute fixtures for agent proof.
+Proposed 90-second sequence, not yet a timed rehearsal:
 
-The sample room is precomputed. Do not claim reconstruction or a personal home.
-Keep a labeled recording for connectivity failure.
+1. Open the room: “A place can become a way back to a memory.”
+2. Visit one object and reveal a selected photo or clip.
+3. Reveal the saved source. Explain manual import versus observed computer use.
+4. Hide the memory, use its cue, then reveal it again.
+5. Reopen the frozen chapter and revisit the same memory.
 
-## Acceptance checks on the presentation laptop
+Use recognition language only after the running build demonstrates confirmed object
+bindings. Baseline pins are manually placed coordinates. Describe placements as
+memory cues, not proof that events occurred at those objects. Show the rough capture
+as an experiment if the final route uses a cleaner licensed setting. Keep its origin
+visible. A backup recording must be labeled as a recording.
 
-- Real scene asset decodes and renders; sample/private-capture label is accurate.
-- Five anchors remain attached to the same loci after navigation and reload.
-- One memory was captured by actual computer use, not a hand-authored fixture.
-- Source reveal shows the matching screenshot/locator and capture time.
-- New memory import, placement, save, and reload run through the viewer UI.
-- Missing scene/media produces an explicit recoverable state.
-- Recall hides content until reveal; no claim of measured cognitive improvement.
-- No console errors or failed required assets during a complete rehearsal.
+## Release rehearsal gate
 
-Record observed values for scene bytes, cold load seconds, navigation responsiveness,
-capture duration, and total demo duration. Until exercised: `not_established`.
+Run against the exact chosen scene, branch, capsule and presentation browser:
 
-## First integrated verification
+- Scene loads with correct origin and attribution; demonstrate three useful views.
+- Every selected memory opens; included videos play and source evidence matches.
+- Confirmed object bindings survive navigation, freeze and fresh reopen.
+- Changing scene identity marks bindings stale rather than silently reusing them.
+- Recall hides content until reveal; save/reload preserves the selected chapter.
+- Run the complete spoken route twice and record duration and any failed step.
+- Inspect console and required asset failures. Keep a tested local backup available.
+
+Record the commit, artifact hash and observed results. Passing the old capsule flow
+does not establish the new object-binding gate. New recognition, final scene quality,
+and the timed stage rehearsal remain pending.
+
+## Historical first-slice verification
+
 
 On 2026-09-08, the production build passed four contract tests and an isolated
 Playwright browser flow with zero console errors or failed HTTP responses. The
@@ -40,4 +50,5 @@ screenshots were inspected.
 One headless Metal run reported 0.74 seconds for local splat decode/load. This
 excludes network download and reconstruction and is not a sustained performance
 claim. Actual capture duration, presenter-room reconstruction, video playback,
-five meaningful object placements, and the full stage rehearsal remain unverified.
+five meaningful object placements, and the full stage rehearsal were unverified in that first-slice run. The later presenter-video results are
+recorded in [reconstruction evidence](../pipelines/scene/RECONSTRUCTION.md).
