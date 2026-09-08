@@ -16,7 +16,7 @@ const button = (label, action) => { const b = node('button',label); b.onclick = 
 const notice = (message) => { $('notice').textContent = message; };
 let palace = {schemaVersion:0,scene:null,anchors:defaultAnchors(),memories:[]};
 let assets = new Map(), selected = palace.anchors[0].id, activeMemory = null, recall = null;
-let renderer, controls, mesh, objectUI, sceneHash = null, loadGeneration = 0;
+let renderer, spark, controls, mesh, objectUI, sceneHash = null, loadGeneration = 0;
 let mediaUrls = [], pins = [], sceneReady = false, creatingMemory = false;
 const world = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(60,1,0.01,10000);
@@ -26,7 +26,7 @@ try {
   renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
   renderer.setClearColor('#211b16');
   $('canvas').append(renderer.domElement);
-  world.add(new SparkRenderer({renderer}));
+  spark = new SparkRenderer({renderer}); world.add(spark);
   controls = new OrbitControls(camera,renderer.domElement);
   controls.enableDamping = false;
   controls.minDistance = 0.05;
@@ -86,7 +86,6 @@ function renderUI() {
   for (const el of $('place-form').elements) el.disabled = frozen();
   for (const url of mediaUrls) URL.revokeObjectURL(url); mediaUrls = [];
   $('places').replaceChildren(); $('pins').replaceChildren(); pins = [];
-  $('pins').hidden=Boolean(palace.objectMemory?.objects.some(o=>o.status!=='rejected'));
   palace.anchors.forEach((a,i) => {
     const b = button(a.label,() => selectAnchor(a.id)); b.setAttribute('aria-pressed',String(a.id === selected));
     b.append(node('span',`${a.memoryIds.length} ${a.memoryIds.length === 1 ? 'memory' : 'memories'}`)); $('places').append(b);
@@ -187,7 +186,11 @@ async function loadScene() {
     await candidate.initialized;
     if (generation !== loadGeneration) { candidate.dispose(); return; }
     candidate.position.fromArray(s.transform.position); candidate.quaternion.fromArray(s.transform.rotation); candidate.scale.setScalar(s.transform.scale);
-    mesh = candidate; world.add(mesh); sceneReady = true; sceneHash = hash; objectUI?.refresh(); $('empty').hidden = true;
+    mesh = candidate; world.add(mesh);
+    // Decoding alone leaves Spark's raycast context empty until its first update.
+    await spark.update({scene:world,camera});
+    if (generation !== loadGeneration) return;
+    sceneReady = true; sceneHash = hash; objectUI?.refresh(); $('empty').hidden = true;
     $('render-status').textContent = `Gaussian splats loaded · ${((performance.now()-start)/1000).toFixed(2)}s`;
   } catch (error) {
     candidate?.dispose(); if (generation !== loadGeneration) return;

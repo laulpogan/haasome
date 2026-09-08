@@ -46,3 +46,38 @@ test('Spark opacity threshold excludes transient low-opacity geometry and backgr
   await page.mouse.click(box.x+box.width/2,box.y+box.height/2);await expect(page.locator('#object-list > button')).toHaveCount(1);
   await page.getByRole('button',{name:'Select surface region',exact:true}).click();await page.mouse.click(box.x+box.width*.92,box.y+box.height*.45);await expect(page.locator('#notice')).toContainText('Background miss');
 });
+
+test('occluding splats hide supported markers and prevent selecting the hidden object',async({page},info)=>{
+  const errors=[],failed=[];
+  page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});page.on('response',r=>{if(r.status()>=400)failed.push(r.url());});
+  const gaussian=(position,scale,color)=>{
+    const bytes=Buffer.alloc(32);position.forEach((n,i)=>bytes.writeFloatLE(n,i*4));
+    for(const offset of [12,16,20])bytes.writeFloatLE(scale,offset);
+    bytes.set([...color,255,255,128,128,128],24);return bytes;
+  };
+  // The red splat lies off the front ray and on the diagonal camera's ray to
+  // the green target. Both remain in the same byte-identical scene throughout.
+  const bytes=Buffer.concat([gaussian([0,0,0],.3,[40,210,100]),gaussian([1.5,0,1.5],.5,[235,65,50])]);
+  const scene={id:'occlusion-test',asset:'occlusion.splat',format:'splat',provenance:{kind:'fixture',attribution:'Two synthetic Gaussians for visibility and hit-selection checks'},transform:{position:[0,0,0],rotation:[0,0,0,1],scale:1},camera:{position:[0,0,4],target:[0,0,0]}};
+  const palace={schemaVersion:0,scene,anchors:[{id:'a',label:'Fixture anchor',position:[9,9,9],memoryIds:[]}],memories:[]};
+  const json=(name,value)=>({name,mimeType:'application/json',buffer:Buffer.from(JSON.stringify(value))});
+  await page.goto('/');await page.locator('#file-input').setInputFiles([json('palace.json',palace),{name:'occlusion.splat',mimeType:'application/octet-stream',buffer:bytes}]);
+  await expect(page.locator('#notice')).toContainText('Imported 2 files');await expect(page.locator('#render-status')).toContainText('Gaussian splats loaded');
+  await page.getByRole('button',{name:'Select surface region',exact:true}).click();
+  const box=await page.locator('#canvas canvas').boundingBox(),center={x:box.x+box.width/2,y:box.y+box.height/2};
+  await page.mouse.click(center.x,center.y);await page.getByRole('button',{name:'Confirm region',exact:true}).click();
+  await expect.poll(()=>page.locator('#object-highlight circle').count()).toBeGreaterThan(4);await expect(page.locator('#pins')).toBeHidden();
+  await page.mouse.click(center.x,center.y);await expect(page.locator('#notice')).toContainText('Selected object: Surface region 1');await page.screenshot({path:info.outputPath('visible.png')});
+  await page.locator('#file-input').setInputFiles(json('scene.json',{...scene,camera:{position:[4,0,4],target:[0,0,0]}}));
+  await expect(page.locator('#notice')).toContainText('Imported 1 files');await expect(page.locator('#render-status')).toContainText('Gaussian splats loaded');
+  // Re-selecting the same object must not draw its markers through the occluder.
+  await page.locator('#object-list > button').click();
+  const observedCounts=await page.evaluate(()=>new Promise(resolve=>{const counts=[];function observe(){counts.push(document.querySelectorAll('#object-highlight circle').length);if(counts.length===30)resolve(counts);else requestAnimationFrame(observe);}requestAnimationFrame(observe);}));
+  expect(Math.max(...observedCounts)).toBe(0);
+  await page.mouse.click(center.x,center.y);await expect(page.locator('#notice')).toContainText('No confirmed object at this surface');
+  await page.screenshot({path:info.outputPath('occluded.png')});
+  await page.locator('#file-input').setInputFiles(json('scene.json',scene));await expect(page.locator('#notice')).toContainText('Imported 1 files');await expect(page.locator('#render-status')).toContainText('Gaussian splats loaded');
+  await page.locator('#object-list > button').click();await expect.poll(()=>page.locator('#object-highlight circle').count()).toBeGreaterThan(4);
+  const marker=await page.locator('#object-highlight circle').first().boundingBox();await page.mouse.click(marker.x+marker.width/2,marker.y+marker.height/2);await expect(page.locator('#notice')).toContainText('Selected object: Surface region 1');
+  await page.screenshot({path:info.outputPath('visible-again.png')});expect(errors).toEqual([]);expect(failed).toEqual([]);
+});

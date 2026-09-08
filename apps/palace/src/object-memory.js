@@ -71,6 +71,7 @@ export function mountObjectMemory({getPalace,getAssets,getMesh,getHash,camera,co
   const mutate = action => { requireEditable(); action(); refresh(); };
   function refresh() {
     const p=getPalace();
+    canvas.closest('#room').querySelector('#pins').hidden=objects().some(o=>o.status!=='rejected');
 
     panel.querySelector('.object-boundary').textContent=p.objectMemory?.recognitions?.length?'Model proposals · two-view surface checks · user-confirmed links':'Manual surface selection · automatic recognition pending';
     $('pick-object').disabled = !editable() || !getMesh() || !getHash();

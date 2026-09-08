@@ -205,3 +205,11 @@ orbit runs measured p95 frame times of 33.4 ms and 50 ms (Metal headless Chromiu
 The preceding batched-check run measured 350 ms. Visibility refreshes over one sample
 cycle during movement; markers can briefly lag an occlusion change. These are short
 local measurements, not a sustained frame-rate guarantee.
+
+Scene readiness waits for Spark’s first scene update, so an immediate click after
+asset replacement uses populated raycast data. The browser occlusion test uses two
+synthetic Gaussians: a target remains bound while a foreground splat blocks its
+markers and selection, then becomes selectable again from the clear viewpoint.
+It checks 30 rendered frames for leaked markers and verifies legacy pins cannot
+intercept selection after manual region creation. This fixture establishes
+visibility behavior; the separate captured-room tests establish recognition.
