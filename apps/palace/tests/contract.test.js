@@ -29,3 +29,15 @@ test('portable capsule includes only references, preserves bytes, rejects missin
     const bad=structuredClone(c); change(bad); assert.throws(()=>validateCapsule(bad));
   }
 });
+
+test('base64 validation uses bounded stack for multi-megabyte assets and rejects malformed padding', async () => {
+  const p=fixture(), bytes=Buffer.alloc(4*1024*1024,173);
+  const c=await freezeCapsule(p,new Map([[p.scene.asset,new Blob([bytes])]]),'Large test');
+  assert.deepEqual(Buffer.from(await unpackCapsule(c).get(p.scene.asset).arrayBuffer()),bytes);
+  for (const data of ['', 'AA==', 'AAA=', 'AAAA', '+/8=']) {
+    c.assets[0].data=data; assert.doesNotThrow(()=>validateCapsule(c));
+  }
+  for (const data of ['A','AAA','====','A===','AA=A','AA==AAAA','AAAA\n','AAAé','AAA_',null,`${bytes.toString('base64').slice(0,-4)}=AAA`]) {
+    c.assets[0].data=data; assert.throws(()=>validateCapsule(c),/Invalid asset base64/);
+  }
+});
