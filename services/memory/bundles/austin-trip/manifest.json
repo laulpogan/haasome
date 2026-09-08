@@ -1,37 +1,39 @@
-[
-  {
-    "path": "assets/memory-235c032afd18495d9a1f49823c3b047f/evidence.jpg",
-    "bytes": 741334,
-    "sha256": "550a08e0c384356c31853d203ec15de0885269f220f4e033233f2e10883315b8"
-  },
-  {
-    "path": "assets/memory-235c032afd18495d9a1f49823c3b047f/media-0.jpg",
-    "bytes": 180892,
-    "sha256": "55c6dbcfc569d652d87ae80dfe181e7bb09f325f384f7228f8f165af343c7a3a"
-  },
-  {
-    "path": "assets/memory-55213a15894b4d2fbc778267e92b46df/media-0.mp4",
-    "bytes": 2617704,
-    "sha256": "f2718c2478e7bda1831ea5c64a9dfb13e520c10bf5e023d072c4b36601c556ab"
-  },
-  {
-    "path": "assets/memory-96fea803d98249ad9acc583d18051cff/media-0.jpg",
-    "bytes": 159760,
-    "sha256": "b23e1167f6787fb7687f5cc4523bafb7791c557b0eb490fed817e370e7411410"
-  },
-  {
-    "path": "assets/memory-austin-mit-save/media-0.mp4",
-    "bytes": 1225826,
-    "sha256": "b6a9f04047bf61640625e1ec1c85cd34fccc0e5399549c7dc246b370ca155f28"
-  },
-  {
-    "path": "assets/memory-ff1c765d72fc47388946a85e39e92ec5/media-0.jpg",
-    "bytes": 2596488,
-    "sha256": "bc781e69003b3bb45d54500d56b80cd991dba21d1ddfa7cdfea2e9a491c6342a"
-  },
-  {
-    "path": "memories.json",
-    "bytes": 4431,
-    "sha256": "a36fcef733b01eb869cf069f1372568a57e04898abd15502cbeb2dcd986fbf71"
-  }
-]
+{
+  "files": [
+    {
+      "path": "assets/memory-235c032afd18495d9a1f49823c3b047f/evidence.jpg",
+      "bytes": 741334,
+      "sha256": "550a08e0c384356c31853d203ec15de0885269f220f4e033233f2e10883315b8"
+    },
+    {
+      "path": "assets/memory-235c032afd18495d9a1f49823c3b047f/media-0.jpg",
+      "bytes": 180892,
+      "sha256": "55c6dbcfc569d652d87ae80dfe181e7bb09f325f384f7228f8f165af343c7a3a"
+    },
+    {
+      "path": "assets/memory-55213a15894b4d2fbc778267e92b46df/media-0.mp4",
+      "bytes": 2617704,
+      "sha256": "f2718c2478e7bda1831ea5c64a9dfb13e520c10bf5e023d072c4b36601c556ab"
+    },
+    {
+      "path": "assets/memory-96fea803d98249ad9acc583d18051cff/media-0.jpg",
+      "bytes": 159760,
+      "sha256": "b23e1167f6787fb7687f5cc4523bafb7791c557b0eb490fed817e370e7411410"
+    },
+    {
+      "path": "assets/memory-austin-mit-save/media-0.mp4",
+      "bytes": 1225826,
+      "sha256": "b6a9f04047bf61640625e1ec1c85cd34fccc0e5399549c7dc246b370ca155f28"
+    },
+    {
+      "path": "assets/memory-ff1c765d72fc47388946a85e39e92ec5/media-0.jpg",
+      "bytes": 2596488,
+      "sha256": "bc781e69003b3bb45d54500d56b80cd991dba21d1ddfa7cdfea2e9a491c6342a"
+    },
+    {
+      "path": "memories.json",
+      "bytes": 4431,
+      "sha256": "a36fcef733b01eb869cf069f1372568a57e04898abd15502cbeb2dcd986fbf71"
+    }
+  ]
+}

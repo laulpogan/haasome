@@ -27,3 +27,7 @@ The original image and screenshot remain unchanged. All referenced media exist a
 ## Soccer clip: presenter-confirmed context
 
 The approximately eight-second original MP4 shows play near the goal and spectators on the sideline. Kamal shared it on February 22 at 4:46 PM. The presenter identified it as a save against MIT, supplied the nickname MI-CHEAT, and approved the exact English card text. Opponent identity and interpretation come from that presenter context; the nickname is not an independently verified misconduct claim. The source-read/export minute is 19:52 UTC on September 8. No new evidence screenshot was saved.
+
+## Folder-import compatibility fix
+
+The manifest uses an object with a `files` array. The viewer treats any top-level JSON array as memories, so the earlier top-level manifest array could reject the whole folder import. Fetch the latest handoff branch and use this corrected folder. Import `austin-trip` itself, not its parent or only `memories.json`.
