@@ -132,3 +132,30 @@ decoding plus segmented JSON Blob assembly fixed the observed failure while
 preserving capsule v1. All five browser tests and six contract tests pass.
 Private snapshot, screenshot and measurements are retained under
 `artifacts/capture-verification/`; no private content or splat binary is in Git.
+
+## Presenter video closes the reconstruction gate
+
+Partner commit `4c3b145` supplied the selected trip bundle: three photos, two videos
+and five records. All seven manifest entries verified after download. Its short
+room clip registered all 17 extracted frames and completed the real capture runner
+in 86.765 seconds including upload and return. The 48,829,321-byte splat rendered
+upright. Quality remains rough around moving people and areas the clip barely sees.
+
+The resulting five-card capsule places memories at the table corner, heart print,
+wall print, round mirror and white door. Both real videos played before freeze and
+after fresh reopen. The original computer-use evidence screenshot was inspected;
+the four manual records retain their conservative provenance. The frozen capsule's
+seven asset hashes and all five records match the assembler's originals.
+
+The 75,141,088-byte snapshot froze in 2707 ms and reopened in 956 ms. Recall,
+save/reload and an editable-copy cue correction preserving source evidence passed.
+Browser page, console and HTTP errors were zero. The earlier 234 MB capsule test
+still establishes the larger-scene path. Source correction on an actual July
+record also passed save/reload while preserving the evidence and original body.
+
+The original MVP's selected media, captured scene, actual app-derived context,
+editable loci, portable freeze/reopen and recall paths have now been observed.
+The Nerfstudio UI export-command demonstration remains separate from the shell
+training/export execution, as required. See the [stage timings and limitations](../pipelines/scene/RECONSTRUCTION.md).
+The deliverable is `artifacts/capture-verification/austin-room-capsule.json`;
+the rendered screenshot and detailed browser results are beside it.

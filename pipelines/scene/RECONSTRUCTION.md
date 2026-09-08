@@ -40,7 +40,7 @@ remote job before submitting another. A local status error does not establish th
 a disconnected remote process stopped. Files are retained for inspection; there is
 no automatic deletion or remote cancellation endpoint.
 
-## Observed boundary, September 8
+## First failed inputs, September 8
 
 - Browser-selected licensed images reached the real trainer and returned its
   registration failure. The import button stayed hidden; no scene was fabricated.
@@ -54,8 +54,48 @@ no automatic deletion or remote cancellation endpoint.
   10000-step result exported a 159,790,969-byte PLY and rendered upright in 0.89s.
   That is a licensed room, not a successful raw-upload reconstruction.
 
-Remaining gate: a selected deliberate room capture must register, train, export,
-return through this runner, and pass visual inspection. See [capture guidance](CAPTURE.md).
+## Presenter video: complete live path
+
+The partner's approved bundle at `codex/tito-whatsapp-handoff` commit `4c3b145`
+provided a 16.95-second H.264 room video (464 × 832). On September 8 at 19:58:57 UTC,
+the browser selected that exact clip and submitted it through the local runner.
+All 17 extracted frames registered without supplied camera poses. The ten-step
+probe, 3000-step training, Gaussian export, private return and browser import passed.
+
+| Stage | Measured seconds |
+| --- | ---: |
+| Upload to prepared trainer | 1.75 |
+| Frame extraction | 0.26 |
+| Camera registration | 7.03 |
+| Ten-step probe including startup | 8.53 |
+| 3000-step training including startup | 31.45 |
+| Gaussian export including startup | 9.49 |
+| Return transfer | 24.97 |
+| Browser-selected upload to observed returned result | 86.77 |
+| Returned result import through rendered scene | 0.38 |
+
+The end-to-end measurement includes browser preparation and status polling, so it
+is longer than the component sum. Environment installation and earlier kernel
+compilation were already complete; no cold-start estimate is implied.
+The PLY is 48,829,321 bytes. The room renders upright with a recognizable table,
+wall prints, mirror and door. Moving people and limited camera coverage create
+visible fragments and gaps; this is a rough MVP scene, not a clean room survey.
+
+Five records from the same selected bundle occupy those five loci. Both original
+videos play after fresh capsule reopen. The 75,141,088-byte capsule froze in 2.707s
+and reopened through rendering in 0.956s; recall, save/reload and evidence-preserving
+editable copies passed with zero browser errors. All embedded bytes match the
+assembler's hashes. Local evidence lives in `artifacts/capture-verification/`:
+`austin-video-timing.json`, `austin-first-render.json`, `austin-capsule-result.json`,
+`austin-room-capsule.json`, and `austin-room-capsule.png`.
+
+The earlier Nerfstudio computer-use demonstration inspected the licensed training
+view and generated a Gaussian export command through its UI. Setup, training and
+actual export execution used the shell; no pause/resume behavior is claimed.
+The presenter-video path above uses the app's capture interface and shell worker.
+
+For a cleaner result, use deliberate overlapping room footage with fewer moving
+subjects. See [capture guidance](CAPTURE.md).
 Nerfstudio's [custom-data instructions](https://docs.nerf.studio/quickstart/custom_dataset.html)
 and COLMAP's [capture guidance](https://colmap.github.io/tutorial.html) explain the
 need for overlapping, sharp views. Random camera-roll memories remain content.
