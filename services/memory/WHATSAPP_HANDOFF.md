@@ -4,8 +4,9 @@
 
 The agent browsed a presenter-selected travel group in WhatsApp for Mac, inspected
 its media gallery, opened selected photos and read their captions and message
-timestamps. This establishes a real native-app read path. It does not yet establish
-an unattended capture service or a completed viewer integration.
+timestamps. It then saved one original photo, saved an actual source-UI screenshot,
+and exported a real `computer-use` memory bundle. The viewer's existing memory
+validator accepts the record. Actual viewer import and recall remain unobserved.
 
 The useful product interaction is: **find a source-backed memory in an existing
 app, propose a recall cue, and attach the resulting record to the palace**.
@@ -41,6 +42,13 @@ the presenter's ignored `artifacts/memory/` directory.
 4. Save a local copy of the chosen media and an actual screenshot of the source
    UI with its context. Record the current capture time in UTC, separately from
    the message timestamp. Verify saved files by opening them.
+   In this trial, WhatsApp's **download → Save as…** saved the original JPEG.
+   The agent used Preview's **File → Take Screenshot → From Entire Screen**,
+   brought the selected WhatsApp media viewer into view during the countdown,
+   visually checked the captured caption/date, and saved the result locally.
+   Native menu actions worked when the menu was read and selected in the same
+   tool invocation. System screenshot keyboard shortcuts alone did not yield a
+   verified file in this environment.
 5. Write title/body/cue from observed source content. Retain uncertainty and
    attribute claims to captions where applicable.
 6. Use the existing exporter; do not change the shared contract:
@@ -72,19 +80,27 @@ does not automate WhatsApp navigation.
   WhatsApp app; no standalone automation start command is claimed.
 - **Input:** one presenter-selected group and selected visible media/captions;
   actual saved local evidence/media are required for packaging.
-- **Public output:** this workflow and observed-status report.
+- **Public output:** this workflow and observed-status report; no private assets.
+- **Private bundle:** `artifacts/memories/austin-corner-kick/` in the presenter's
+  project checkout, containing `memories.json`, the original JPEG, the source-UI
+  evidence JPEG, and a SHA-256 asset manifest.
+- **Private transfer archive:** `artifacts/memories/austin-corner-kick-private.zip`.
+  Unzip it and import the contained `austin-corner-kick` folder with **Open bundle**
+  after choosing a place in A's viewer. Do not upload this archive to the public repo.
 - **Private notes:** `artifacts/memory/austin-review.md` and
   `artifacts/memory/austin-handoff-en.md` in the presenter's project checkout.
-- **Observed result:** real UI navigation, gallery inspection and selected full-size
-  image/caption reads. UI screenshots are visible in the agent conversation.
-- **Remaining blocker at this revision:** export of independent photo/evidence files
-  is not yet verified. Native menu attempts did not yield a confirmed saved file,
-  and user activity interrupted subsequent app actions.
-- **Remaining integration:** valid real-capture bundle, A's actual viewer import,
-  scene consumption, evidence reveal and recall/revisit loop.
-- **Validation:** documentation paths and existing exporter CLI checked; no product
-  code changes or new dependencies in this handoff. No synthetic test is presented
-  as computer-use evidence.
+- **Observed result:** real UI navigation, photo save, screenshot save, export of
+  one source-backed record and its two assets. The screenshot was visually checked
+  in Preview. No result or personal feeling was invented beyond the source caption.
+- **Capture timestamp:** source screenshot observed in the 19:24 UTC minute on
+  September 8, 2026; the record uses `19:24:00Z` with minute precision, not a claim
+  of second-level timing. The original message date is separate in the locator.
+- **Remaining integration:** A's actual viewer import, scene consumption, evidence
+  reveal and recall/revisit loop. The source-file export blocker is resolved.
+- **Validation:** existing `validateMemories` from `apps/palace/src/contract.js`
+  passed for the actual exported record; all referenced files exist and are
+  nonempty; original and copied asset hashes match. The transfer ZIP was checked.
+  No product code changes, new dependencies or synthetic capture claims.
 
 Keep all private bundles outside Git. Transfer selected assets through an approved
 private channel or directly on the demo machine. The coordinator decides whether
