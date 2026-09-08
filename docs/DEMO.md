@@ -11,7 +11,9 @@ These are presentation allocations, not execution-speed claims. Capture and veri
 the technical lesson before the stage demo. If only manual content exists, label
 the demonstration as a spatial lesson; do not substitute fixtures for agent proof.
 
-The sample room is precomputed. Do not claim reconstruction or a personal home.
+The original table-tennis room is precomputed. The new seating-area sample was
+trained during this build from licensed photographs with supplied camera poses.
+Distinguish those assets; neither is a personal home or fresh phone registration.
 Keep a labeled recording for connectivity failure.
 
 ## Acceptance checks on the presentation laptop
@@ -41,3 +43,12 @@ One headless Metal run reported 0.74 seconds for local splat decode/load. This
 excludes network download and reconstruction and is not a sustained performance
 claim. Actual capture duration, presenter-room reconstruction, video playback,
 five meaningful object placements, and the full stage rehearsal remain unverified.
+
+## Fresh reconstruction and UI evidence
+
+Dell completed a 10-step probe and 3000-step Splatfacto run. The real Nerfstudio UI
+was operated to hide cameras and generate an export command. A shell export then
+created a 180224929-byte PLY containing 726707 Gaussians. The palace consumed it and
+the matching screenshot-backed memory bundle, then restored both after reload.
+The new scene's starting orientation was corrected and visually inspected upright.
+Artifacts and remaining limits are in [training handoff](../pipelines/scene/TRAINING.md).

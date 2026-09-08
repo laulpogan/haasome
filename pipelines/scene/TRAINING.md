@@ -26,7 +26,10 @@ The project container is `haasome-splat-trainer` on the authorized RTX host.
 `/workspace/haasome/venv` isolates installed packages from the cached CUDA image.
 Python 3.12, PyTorch 2.13.0+cu130, CUDA compiler 13.0, and a real GPU tensor operation
 passed. Nerfstudio installation and `ns-train splatfacto --help` passed. Kernel
-compilation and complete training are separate gates.
+compilation and complete training subsequently passed: the 10-step probe exited
+zero, then the 3000-step run completed and exported 726707 Gaussians. Late training
+steps reported roughly 7–8 ms; this excludes cold compilation, input transfer,
+pose estimation, export, and viewer interaction. Do not extrapolate capture latency.
 
 The upstream Nerfstudio Dockerfile uses CUDA 11.8; do not assume that image works
 on Blackwell. This run uses the host's cached `sglang-flashnext:sm120` image, so the
@@ -62,7 +65,37 @@ In the real Nerfstudio training viewer, verify the available controls, then:
 6. Use Export → Splat to generate the export command, then execute that command
    through the shell. The UI does not itself export a Gaussian PLY.
 
-These controls are source-verified, not yet live-verified. Viewport crop changes
+The real browser UI was used to hide training cameras, open Export → Splat, set the
+output directory, and generate the command. Screenshot evidence is at
+`artifacts/training-ui/export-command.png`. Pause/crop/path controls remain
+source-verified only. The viewer displayed Step 0 after a completed 3000-step run;
+the checkpoint and training log establish completion, not that stale UI counter.
+Viewport crop changes
 the displayed region; it does not change the training dataset or delete splats.
 Save UI evidence outside Git. Transfer the resulting Gaussian PLY with scene.json
 and attribution, then load that exact bundle through the palace's existing import.
+
+## Verified export and handoff
+
+Export initially hit PyTorch's newer weights-only checkpoint default. The retry
+scoped `TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1` to this export process for the checkpoint
+we had just trained. Never apply that override to an untrusted downloaded checkpoint.
+No global Python setting was changed. Missing optional mesh OpenGL plugins emitted
+warnings; Gaussian export succeeded without those plugins.
+
+The complete PLY is 180224929 bytes. Local bundle:
+`artifacts/scene/seating-trained/`. It contains the PLY, scene.json, and MIT license.
+The camera-0 capture positions form a near-planar track; its smallest principal
+component supplied a vertical axis, with sign selected from the camera orientation.
+The palace view was visually checked upright after applying that rotation. This is
+a dataset-specific orientation correction, not automatic gravity estimation.
+
+Actual UI-derived memory bundle: `artifacts/memories/nerfstudio-export/`.
+The palace loaded both bundles, displayed the captured evidence, and restored them
+after save/reload without page errors. Starting objects and remaining four memory
+cards are teammate work. Full freeze and training logs are retained outside Git at
+`artifacts/training-ui/`.
+
+The second RTX host is now reachable after the user fixed its SSH access rule.
+A CUDA tensor computation passed there too; an isolated trainer installation is in
+progress. It will run an independent quality candidate after its short probe passes.

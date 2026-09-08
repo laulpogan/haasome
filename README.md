@@ -6,8 +6,9 @@ anchors, selected photos/video, and one observed computer-use capture from an ap
 
 **Status: first runnable slice on `integration/first-palace`.** The browser renders
 a licensed real room and imports local memory/media bundles, with placement,
-recall/reveal, and save/reload. App capture remains fixture-only; no personal room
-has been reconstructed. Active pivot: operate Nerfstudio's reconstruction UI on a
+recall/reveal, and save/reload. A fresh public-room reconstruction now loads, along
+with a screenshot-backed lesson captured through Nerfstudio's real export UI.
+No personal room has been reconstructed. Active pivot: operate Nerfstudio's reconstruction UI on a
 remote RTX host, export a fresh scene, and remember that workflow in the palace.
 The earlier [Pro rounds](docs/PRO-IDEAS.md) remain idea context.
 
