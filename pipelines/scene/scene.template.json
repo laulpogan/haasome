@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 0,
+  "id": "table-tennis-room-0d9e613b-v1",
+  "asset": "table-tennis-room.sog",
+  "format": "sog",
+  "provenance": {
+    "kind": "licensed-sample",
+    "attribution": "Table Tennis Room by Ethan (ethan3111), https://superspl.at/scene/0d9e613b — CC BY 4.0, https://creativecommons.org/licenses/by/4.0/. Repackaged as a ZIP .sog; original payloads unchanged. Display transform and provisional camera added. Licensed sample, not the presenter’s room."
+  },
+  "transform": {
+    "position": [
+      0,
+      0,
+      0
+    ],
+    "rotation": [
+      0,
+      0,
+      1,
+      0
+    ],
+    "scale": 1
+  },
+  "camera": {
+    "position": [
+      0,
+      0,
+      15
+    ],
+    "target": [
+      0,
+      0,
+      0
+    ]
+  }
+}
