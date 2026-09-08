@@ -47,7 +47,8 @@ load; a fast training step cannot establish reconstruction success.
 
 ## Model consultation
 
-GPT-6 Pro idea consultation was submitted through signed-in ChatGPT. Retrieval
-encountered browser timeouts; no answer has yet been incorporated. Save the actual
-answer and decision changes only after reading it. Do not infer a recommendation
-from the submitted prompt or the model's progress messages.
+The browser consultation encountered retrieval timeouts. A text-only ChatGPT Web
+Pro worker then completed two rounds. It proposed a shared-trip story, then retracted
+that default when challenged about missing private assets. Adopted primary:
+"Remember the fix," a public technical lesson mapped to five loci. Nostalgia waits
+for presenter-selected input. Full responses and decisions: [PRO-IDEAS.md](PRO-IDEAS.md).

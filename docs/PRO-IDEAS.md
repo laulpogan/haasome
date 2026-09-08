@@ -60,4 +60,35 @@ been provided. Do not access private mail to make this recommendation work.
 Challenge sent for round 2: choose a primary story that works without private data,
 plus a natural technical-app variant and an asset-dependent nostalgia option.
 Require explicit handling of slow agent execution; do not turn rehearsal targets
-into performance claims. Round 2 pending.
+into performance claims.
+
+## Round 2 — full response
+
+Yes. The trip story assumed missing assets and made its emotional payoff depend on private access. **Primary: “Remember the fix.”** Recover one useful technical lesson from public material, then rehearse it through five room locations.
+
+**Natural technical-app variant:** Use GitHub’s browser interface to investigate a documented scene-import problem in a public splat project. Follow the issue into linked documentation or a fix. Recover one consequential condition, such as a version requirement, **only when the source supports it**. Distinguishing an obsolete workaround from the documented resolution gives computer use meaningful work.
+
+Five loci form a troubleshooting route: doorway = prerequisite; screen = symptom; desk = cause; toolbox = correction; light switch = verification. These are deliberate mnemonic associations. The room does not represent the software’s physical environment.
+
+The learning claim remains modest: demonstrate unaided recall during the demo. Improved retention requires testing. Gaussian splats provide atmosphere; this build does not establish that they are necessary.
+
+**Fallback:** Rehearse a five-step workflow extracted from one public documentation page, dropping issue-history investigation. Use a completed, source-backed capture. A successful recorded agent run can demonstrate computer use; a manually assembled lesson demonstrates only the spatial learning interaction. Label that boundary.
+
+**Available-input scope:** The licensed room supports the viewer, route, cards, and recall interaction. Builders can choose a public source without accessing private accounts. Extraction and source interpretation still need a successful run; neither is established by the current scaffold.
+
+**Presenter-selected input:** Personal photos, videos, private conversations, and a familiar-room capture. Add nostalgia only after those exist.
+
+**90-second demo:** Finish extraction before presenting. Spend 15 seconds posing the problem, 20 showing a labeled excerpt of the actual agent trace and its consequential finding, 30 traversing the five loci, and 25 on a cards-hidden recall question followed by source verification. These are presentation allocations, not agent-speed promises. Keep live extraction outside the critical path.
+
+**Retractions:** The trip as default; requiring selected email or trip media; budgeting a live lookup into a fixed stage interval. Keep five anchors, source evidence, and the revisit loop.
+
+## Coordinator decision
+
+Accept "Remember the fix" as the first story. It matches the technical-app interest
+and supplies a public-source route without private-data assumptions. Keep nostalgia
+as the asset-dependent next story. Accept pre-capture plus labeled trace for the
+90-second presentation; no latency claim until an actual run is timed.
+
+Do not claim that splats are necessary for learning or that retention improved.
+No technical issue has been selected or captured yet. First integrated sample
+content remains fixture-labeled until that source workflow completes.

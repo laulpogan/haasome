@@ -1,15 +1,18 @@
 # Demo and acceptance
 
-## Proposed 90-second story
+## Proposed 90-second story: Remember the fix
 
-1. 0–15s: enter the captured room and recognize a specific object.
-2. 15–35s: show the agent reading one chosen source in an existing app.
-3. 35–55s: inspect the extracted detail and evidence; place it at a meaningful locus.
-4. 55–75s: visit two selected photo/video memories along the same room route.
-5. 75–90s: hide the detail, follow a recall cue, return, and reveal its source.
+1. 0–15s: pose one technical problem and enter the licensed room.
+2. 15–35s: show a labeled excerpt of a completed agent UI capture and its finding.
+3. 35–65s: walk five loci: prerequisite, symptom, cause, correction, verification.
+4. 65–90s: hide the cards, recall the consequential detail, and reveal its source.
 
-Reconstruction happens before the stage demo. Do not pretend that a precomputed
-room was rebuilt live. Keep a labeled recording for connectivity failure.
+These are presentation allocations, not execution-speed claims. Capture and verify
+the technical lesson before the stage demo. If only manual content exists, label
+the demonstration as a spatial lesson; do not substitute fixtures for agent proof.
+
+The sample room is precomputed. Do not claim reconstruction or a personal home.
+Keep a labeled recording for connectivity failure.
 
 ## Acceptance checks on the presentation laptop
 
