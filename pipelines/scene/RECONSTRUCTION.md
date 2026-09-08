@@ -172,10 +172,38 @@ describe the Nerfstudio comparisons as Spark comparisons or the candidate as the
 completed memory capsule.
 
 The installed Splatfacto loss multiplies both target and prediction by each mask;
-its dataparser requires mask paths for all frames or none. No masked result is
-claimed. Masking has not been tested and cannot reveal surfaces hidden in every
-source frame. A requested read-only review stopped at workspace trust; it supplied
-no verdict.
+its dataparser requires mask paths for all frames or none. A bounded comparison
+used conservative manual rectangles around moving players in all 17 native frames,
+with unchanged poses, sparse initialization and training settings. Excluded area
+ranged from 13.4% to 72.8%; rectangles also exclude static pixels and carry no
+segmentation-accuracy claim. The ten-step probe took 8.084s, 10000-step training
+67.224s, and export 7.285s. PyTorch measured peak allocated CUDA memory of
+3,466,648,576 bytes and peak reserved memory of 3,487,563,776 bytes during training.
+These counters exclude allocations outside PyTorch; they are not total GPU usage.
+
+Three matched Nerfstudio renders show fewer central player ghosts but large
+streaks on both sides. Reject this masked result as the replacement scene. This
+bounded failure does not establish that better masks cannot help. It establishes
+that loss masking alone, with these conservative rectangles and existing sparse
+initialization, did not produce an acceptable room. Masks cannot reveal surfaces
+hidden in every source frame. Private masks, source hashes, rectangle coordinates,
+logs and timings are retained under `artifacts/quality/masked-v1/`; renders are
+`artifacts/quality/masked-10000-view-{0,1,2}.jpg`.
+
+The selected experimental candidate now has a local
+`artifacts/quality/native-10000/source-pose-mapping.json`: all 17 extracted-frame
+hashes and camera poses, original video hash, intrinsics and dataparser transform.
+The original video hash was checked against the approved source bundle.
+`artifacts/quality/view-capsules/a{0,1,2}.json` hold the baseline and
+`b{0,1,2}.json` the native-10000 candidate at the same three poses. These are
+script-assembled comparison capsules with empty memory bindings, not new capture.
+
+Matched Spark verification remains pending. Shared Chrome changed to another
+lane's viewer during verification; further UI actions stopped to avoid contention.
+The isolated browser was unavailable. Presenter feedback in the linked coordinator
+thread judged the candidate too rough, and the coordinator moved toward the demo
+fallback. The candidate is experimental, not a completed visual-quality result.
+A requested read-only review stopped at workspace trust; it supplied no verdict.
 
 ### Missing capture request
 
