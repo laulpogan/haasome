@@ -31,3 +31,18 @@ test('manual geometry region links, searches and survives frozen reopen',async({
   await expect(fresh.getByRole('button',{name:'Confirm region',exact:true})).toBeDisabled();await expect(fresh.locator('#object-detail')).toContainText('This surface cues');await fresh.screenshot({path:info.outputPath('reopened.png')});await context.close();
   expect(errors).toEqual([]);expect(failed).toEqual([]);
 });
+
+test('Spark opacity threshold excludes transient low-opacity geometry and background',async({page},info)=>{
+  const make=(alpha)=>{
+    const splat=Buffer.alloc(32);for(const offset of [12,16,20])splat.writeFloatLE(.4,offset);splat.set([220,160,80,alpha,255,128,128,128],24);return splat;
+  };
+  const p={schemaVersion:0,scene:{id:'opacity-test',asset:'test.splat',format:'splat',provenance:{kind:'fixture',attribution:'Synthetic opacity boundary test'},transform:{position:[0,0,0],rotation:[0,0,0,1],scale:1},camera:{position:[0,0,3],target:[0,0,0]}},anchors:[{id:'a',label:'Fixture anchor',position:[9,9,9],memoryIds:[]}],memories:[]};
+  await page.goto('/');
+  const files=alpha=>[{name:'palace.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(p))},{name:'test.splat',mimeType:'application/octet-stream',buffer:make(alpha)}];
+  await page.locator('#file-input').setInputFiles(files(50));await expect(page.locator('#render-status')).toContainText('Gaussian splats loaded');await page.getByRole('button',{name:'Select surface region',exact:true}).click();
+  const box=await page.locator('#canvas canvas').boundingBox();await page.mouse.click(box.x+box.width/2,box.y+box.height/2);await expect(page.locator('#notice')).toContainText('Background miss');await expect(page.locator('#object-list > button')).toHaveCount(0);
+  await page.locator('#file-input').setInputFiles(files(255));await expect(page.locator('#notice')).toContainText('Imported 2 files');await expect(page.locator('#render-status')).toContainText('Gaussian splats loaded');
+  // Selection mode remains armed after a miss.
+  await page.mouse.click(box.x+box.width/2,box.y+box.height/2);await expect(page.locator('#object-list > button')).toHaveCount(1);
+  await page.getByRole('button',{name:'Select surface region',exact:true}).click();await page.mouse.click(box.x+box.width*.92,box.y+box.height*.45);await expect(page.locator('#notice')).toContainText('Background miss');
+});

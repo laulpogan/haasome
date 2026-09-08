@@ -1,3 +1,4 @@
+import { importRecognition, recognitionAssets, verifyRecognitionEvidence } from './recognition.js';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { SparkRenderer, SplatMesh, SplatFileType } from '@sparkjsdev/spark';
@@ -42,6 +43,7 @@ try {
   });
 } catch (error) { notice(`WebGL renderer unavailable: ${error.message}. Try a browser with WebGL2 enabled.`); }
 function home() {
+  camera.up.set(0,1,0); camera.fov=60; camera.updateProjectionMatrix();
   const pose = palace.scene?.camera || {position:[0,1.6,4],target:[0,1,0]};
   camera.position.fromArray(pose.position); controls?.target.fromArray(pose.target); controls?.update();
 }
@@ -84,6 +86,7 @@ function renderUI() {
   for (const el of $('place-form').elements) el.disabled = frozen();
   for (const url of mediaUrls) URL.revokeObjectURL(url); mediaUrls = [];
   $('places').replaceChildren(); $('pins').replaceChildren(); pins = [];
+  $('pins').hidden=Boolean(palace.objectMemory?.objects.some(o=>o.status!=='rejected'));
   palace.anchors.forEach((a,i) => {
     const b = button(a.label,() => selectAnchor(a.id)); b.setAttribute('aria-pressed',String(a.id === selected));
     b.append(node('span',`${a.memoryIds.length} ${a.memoryIds.length === 1 ? 'memory' : 'memories'}`)); $('places').append(b);
@@ -201,7 +204,7 @@ async function importFiles(files) {
     nextAssets.set(path,file);
     if (file.name.endsWith('.json')) {
       const value = JSON.parse(await file.text());
-      if (Array.isArray(value) || value?.capsuleVersion !== undefined || value?.schemaVersion !== undefined || (value?.asset && value?.camera)) documents.push(value);
+      if (Array.isArray(value) || value?.capsuleVersion !== undefined || value?.recognitionVersion !== undefined || value?.schemaVersion !== undefined || (value?.asset && value?.camera)) documents.push(value);
     }
   }
   const capsules = documents.filter(x => x?.capsuleVersion !== undefined);
@@ -209,11 +212,24 @@ async function importFiles(files) {
     if (files.length !== 1 || capsules.length !== 1) throw new Error('Import one capsule container by itself.');
     const container = capsules[0];
     const importedAssets = unpackCapsule(container);
+    await verifyRecognitionEvidence(container.palace.objectMemory,importedAssets,resolveAsset);
     palace = structuredClone(container.palace); assets = importedAssets;
     selected = palace.anchors[0].id; activeMemory = null; recall = null;
     renderUI(); await loadScene(); notice('Capsule reopened with its saved assets.'); return;
   }
   requireEditable();
+  const recognition = documents.filter(x=>x?.recognitionVersion!==undefined);
+  if(recognition.length) {
+    if(recognition.length!==1||documents.length!==1||!sceneReady)throw new Error('Import one recognition bundle after loading its scene.');
+    for(const path of recognitionAssets({recognitions:recognition}))assetPath(path);
+    const current=palace,currentMesh=mesh,currentHash=sceneHash,before=JSON.stringify(palace);
+    notice('Checking recognized regions against both source views…');
+    const sidecar=await importRecognition(recognition[0],nextAssets,palace,mesh,sceneHash,resolveAsset);
+    requireEditable();
+    if(palace!==current||mesh!==currentMesh||sceneHash!==currentHash||JSON.stringify(palace)!==before)throw new Error('Scene changed during recognition. Import again.');
+    const next={...palace,objectMemory:sidecar};validatePalace(next);palace=next;assets=nextAssets;renderUI();
+    notice(`${sidecar.objects.length} supported object regions; ${sidecar.rejections.length} unsupported proposals rejected. Inspect source views, then confirm.`);return;
+  }
   let next = structuredClone(palace);
   // Full palace establishes assembly; scene and memory handoffs can then augment it.
   const full = documents.filter(x => !Array.isArray(x) && x.schemaVersion !== undefined && 'scene' in x);
@@ -329,5 +345,5 @@ try {
   if (stored) { palace = validatePalace(stored.palace); if (!frozen()) completeAnchors(palace); assets = new Map(stored.assets); selected = palace.anchors[0].id; notice('Restored the saved palace and its local assets.'); }
 } catch (error) { notice(`Saved palace unavailable: ${error.message}. Reimport your bundle.`); }
 mountCapture({importFiles, requireEditable, sceneReady:()=>sceneReady});
-objectUI = renderer ? mountObjectMemory({getPalace:()=>palace,getMesh:()=>sceneReady?mesh:null,getHash:()=>sceneHash,camera,controls,canvas:renderer.domElement,notice,requireEditable,openMemory:id=>{const anchor=palace.anchors.find(a=>a.memoryIds.includes(id));if(anchor)selected=anchor.id;activeMemory=id;recall=null;renderUI();}}) : null;
+objectUI = renderer ? mountObjectMemory({getPalace:()=>palace,getAssets:()=>assets,getMesh:()=>sceneReady?mesh:null,getHash:()=>sceneHash,camera,controls,canvas:renderer.domElement,notice,requireEditable,openMemory:id=>{const anchor=palace.anchors.find(a=>a.memoryIds.includes(id));if(anchor)selected=anchor.id;activeMemory=id;recall=null;renderUI();}}) : null;
 renderUI(); await loadScene();

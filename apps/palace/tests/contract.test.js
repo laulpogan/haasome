@@ -63,3 +63,35 @@ test('object identity, memory search, frozen copying and stale scenes preserve b
     const bad=structuredClone(frozen.palace);change(bad.objectMemory.objects[0]);assert.throws(()=>validateObjectMemory(bad.objectMemory,bad));
   }
 });
+
+import {validateRecognition,sourceRay,projectSource,liftProposal,supportInView,verifyRecognitionEvidence,sha256} from '../src/recognition.js';
+function recognitionFixture() {
+  const intrinsics={w:1000,h:1000,fl_x:700,fl_y:700,cx:500,cy:500,k1:.01,k2:0,k3:0,k4:0,p1:0,p2:0};
+  const views=[0,.3].map((x,i)=>({id:`view-${i}`,asset:`recognition/frame-${i}.jpg`,assetHash:'a'.repeat(64),cameraToScene:[[1,0,0,x],[0,1,0,0],[0,0,1,3],[0,0,0,1]],intrinsics}));
+  const polygon=[[300,300],[700,300],[700,700],[300,700]];
+  return {recognitionVersion:1,sceneId:'synthetic',assetHash:'a'.repeat(64),views,model:{name:'Synthetic test, no model run',responseId:'test',at:'2026-09-08T23:00:00Z',prompt:'Synthetic geometry test',evidenceAsset:'recognition/model.json',evidenceHash:'b'.repeat(64)},objects:[{id:'plane',label:'Synthetic plane',ambiguity:'none',observations:[{viewIndex:0,polygon},{viewIndex:1,polygon}],suggestions:[]}]};
+}
+test('registered camera projection roundtrips with distortion and transformed mesh',()=>{
+  const mesh=new THREE.Mesh(new THREE.PlaneGeometry(10,10),new THREE.MeshBasicMaterial());mesh.position.set(2,4,-1);mesh.rotation.x=.4;mesh.scale.setScalar(1.7);mesh.updateWorldMatrix(true,false);
+  const view=recognitionFixture().views[0];
+  for(const pixel of [[320,410],[500,500],[650,640]]){
+    const ray=sourceRay(mesh,view,pixel),hit=ray.intersectObject(mesh,false)[0];assert.ok(hit);
+    const projected=projectSource(mesh.worldToLocal(hit.point.clone()),view);assert.ok(Math.hypot(projected[0]-pixel[0],projected[1]-pixel[1])<1e-5);
+  }
+});
+test('lifting rejects ambiguity, misses and second-view occlusion',()=>{
+  const mesh=new THREE.Mesh(new THREE.PlaneGeometry(10,10),new THREE.MeshBasicMaterial()),bundle=recognitionFixture();validateRecognition(bundle);
+  const lifted=liftProposal(mesh,bundle,bundle.objects[0]);assert.ok(lifted.samples.length>=5);assert.ok(lifted.samples.every(p=>Math.abs(p[2])<1e-6));
+  assert.throws(()=>liftProposal(mesh,bundle,{...bundle.objects[0],ambiguity:'mirror reflection'}),/Ambiguous/);
+  const misses=structuredClone(bundle);misses.views[1].cameraToScene[0][3]=100;assert.throws(()=>liftProposal(mesh,misses,misses.objects[0]),/Only 0 surface samples/);
+  const point=new THREE.Vector3(0,0,0),view=bundle.views[0],region=bundle.objects[0].observations[0].polygon;
+  assert.ok(supportInView(mesh,point,view,region,.01));mesh.geometry.translate(0,0,1);mesh.updateWorldMatrix(true,false);assert.equal(supportInView(mesh,point,view,region,.01),false);
+  for(const modify of [b=>b.views[1].id=b.views[0].id,b=>b.views[0].cameraToScene[0][0]=2,b=>b.objects[0].observations[0].polygon=[[Infinity,0],[1,0],[1,1]],b=>b.views[0].intrinsics.fl_x=0]){const bad=structuredClone(bundle);modify(bad);assert.throws(()=>validateRecognition(bad));}
+});
+test('recognition evidence hashes reject changed frame or model output bytes',async()=>{
+  const b=recognitionFixture(),assets=new Map();
+  for(const v of b.views){const blob=new Blob([v.id]);assets.set(v.asset,blob);v.assetHash=await sha256(blob);}
+  const raw=new Blob(['model output']);assets.set(b.model.evidenceAsset,raw);b.model.evidenceHash=await sha256(raw);
+  await verifyRecognitionEvidence({recognitions:[b]},assets,resolveAsset);
+  assets.set(b.views[0].asset,new Blob(['changed']));await assert.rejects(()=>verifyRecognitionEvidence({recognitions:[b]},assets,resolveAsset),/changed recognition evidence/);
+});

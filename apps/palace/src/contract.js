@@ -1,3 +1,4 @@
+import { recognitionAssets } from './recognition.js';
 import { validateObjectMemory } from './object-memory.js';
 const fail = (message) => { throw new Error(message); };
 const text = (v, name) => typeof v === 'string' && v.trim() ? v : fail(`${name} must be text.`);
@@ -58,6 +59,7 @@ export function validatePalace(p) {
     if (!Array.isArray(a.memoryIds) || a.memoryIds.some(id => !p.memories.some(m => m.id === id))) fail('Anchor references an unknown memory.');
   }
   validateObjectMemory(p.objectMemory, p);
+  for (const path of recognitionAssets(p.objectMemory)) assetPath(path);
   return p;
 }
 export function completeAnchors(p) {
