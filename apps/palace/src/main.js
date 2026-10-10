@@ -1,3 +1,4 @@
+import { importRecognition, recognitionAssets, verifyRecognitionEvidence } from './recognition.js';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { SparkRenderer, SplatMesh, SplatFileType } from '@sparkjsdev/spark';
@@ -6,6 +7,7 @@ import { freezeCapsule, unpackCapsule, capsuleBlob } from './capsule.js';
 import { saveLocal, loadLocal } from './storage.js';
 import { decodeSelectedMedia } from './media.js';
 import { mountCapture } from './capture.js';
+import { mountObjectMemory } from './object-memory.js';
 import './style.css';
 
 const $ = (id) => document.getElementById(id);
@@ -14,7 +16,7 @@ const button = (label, action) => { const b = node('button',label); b.onclick = 
 const notice = (message) => { $('notice').textContent = message; };
 let palace = {schemaVersion:0,scene:null,anchors:defaultAnchors(),memories:[]};
 let assets = new Map(), selected = palace.anchors[0].id, activeMemory = null, recall = null;
-let renderer, controls, mesh, loadGeneration = 0;
+let renderer, spark, controls, mesh, objectUI, sceneHash = null, loadGeneration = 0;
 let mediaUrls = [], pins = [], sceneReady = false, creatingMemory = false;
 const world = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(60,1,0.01,10000);
@@ -24,7 +26,7 @@ try {
   renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
   renderer.setClearColor('#211b16');
   $('canvas').append(renderer.domElement);
-  world.add(new SparkRenderer({renderer}));
+  spark = new SparkRenderer({renderer}); world.add(spark);
   controls = new OrbitControls(camera,renderer.domElement);
   controls.enableDamping = false;
   controls.minDistance = 0.05;
@@ -32,6 +34,7 @@ try {
   new ResizeObserver(resize).observe(room); resize();
   renderer.setAnimationLoop(() => {
     controls.update(); renderer.render(world,camera);
+    objectUI?.frame(performance.now());
     for (const {anchor,el} of pins) {
       const p = new THREE.Vector3(...anchor.position).project(camera);
       el.hidden = !sceneReady || p.z < -1 || p.z > 1 || Math.abs(p.x)>1 || Math.abs(p.y)>1;
@@ -40,6 +43,7 @@ try {
   });
 } catch (error) { notice(`WebGL renderer unavailable: ${error.message}. Try a browser with WebGL2 enabled.`); }
 function home() {
+  camera.up.set(0,1,0); camera.fov=60; camera.updateProjectionMatrix();
   const pose = palace.scene?.camera || {position:[0,1.6,4],target:[0,1,0]};
   camera.position.fromArray(pose.position); controls?.target.fromArray(pose.target); controls?.update();
 }
@@ -68,6 +72,7 @@ function requireEditable() {
   if (frozen()) throw new Error('Frozen capsule is read-only. Make editable copy first.');
 }
 function renderUI() {
+  objectUI?.refresh();
   $('capsule-title').value = palace.capsule?.title || 'A moment to keep';
   $('capsule-title').disabled = frozen();
   $('capsule-status').textContent = frozen() ? `Frozen ${palace.capsule.frozenAt} · Read-only snapshot` : 'Editable draft';
@@ -154,7 +159,8 @@ function renderUI() {
   }; label.append(picker); card.append(label);
 }
 async function loadScene() {
-  const generation = ++loadGeneration; sceneReady = false;
+  const generation = ++loadGeneration; sceneReady = false; sceneHash = null;
+  objectUI?.refresh();
   if (mesh) { world.remove(mesh); mesh.dispose(); mesh = null; }
   $('empty').hidden = false; $('render-status').textContent = 'Waiting for a scene';
   home();
@@ -173,11 +179,18 @@ async function loadScene() {
   try {
     const bytes = new Uint8Array(await file.arrayBuffer());
     if (generation !== loadGeneration) return;
-    candidate = new SplatMesh({fileBytes:bytes,fileName:s.asset,fileType:s.format === 'sog' ? SplatFileType.PCSOGSZIP : s.format});
+    const digest = await crypto.subtle.digest('SHA-256',bytes);
+    if (generation !== loadGeneration) return;
+    const hash = [...new Uint8Array(digest)].map(b=>b.toString(16).padStart(2,'0')).join('');
+    candidate = new SplatMesh({minRaycastOpacity:0.5,fileBytes:bytes,fileName:s.asset,fileType:s.format === 'sog' ? SplatFileType.PCSOGSZIP : s.format});
     await candidate.initialized;
     if (generation !== loadGeneration) { candidate.dispose(); return; }
     candidate.position.fromArray(s.transform.position); candidate.quaternion.fromArray(s.transform.rotation); candidate.scale.setScalar(s.transform.scale);
-    mesh = candidate; world.add(mesh); sceneReady = true; $('empty').hidden = true;
+    mesh = candidate; world.add(mesh);
+    // Decoding alone leaves Spark's raycast context empty until its first update.
+    await spark.update({scene:world,camera});
+    if (generation !== loadGeneration) return;
+    sceneReady = true; sceneHash = hash; objectUI?.refresh(); $('empty').hidden = true;
     $('render-status').textContent = `Gaussian splats loaded · ${((performance.now()-start)/1000).toFixed(2)}s`;
   } catch (error) {
     candidate?.dispose(); if (generation !== loadGeneration) return;
@@ -194,7 +207,7 @@ async function importFiles(files) {
     nextAssets.set(path,file);
     if (file.name.endsWith('.json')) {
       const value = JSON.parse(await file.text());
-      if (Array.isArray(value) || value?.capsuleVersion !== undefined || value?.schemaVersion !== undefined || (value?.asset && value?.camera)) documents.push(value);
+      if (Array.isArray(value) || value?.capsuleVersion !== undefined || value?.recognitionVersion !== undefined || value?.schemaVersion !== undefined || (value?.asset && value?.camera)) documents.push(value);
     }
   }
   const capsules = documents.filter(x => x?.capsuleVersion !== undefined);
@@ -202,11 +215,24 @@ async function importFiles(files) {
     if (files.length !== 1 || capsules.length !== 1) throw new Error('Import one capsule container by itself.');
     const container = capsules[0];
     const importedAssets = unpackCapsule(container);
+    await verifyRecognitionEvidence(container.palace.objectMemory,importedAssets,resolveAsset);
     palace = structuredClone(container.palace); assets = importedAssets;
     selected = palace.anchors[0].id; activeMemory = null; recall = null;
     renderUI(); await loadScene(); notice('Capsule reopened with its saved assets.'); return;
   }
   requireEditable();
+  const recognition = documents.filter(x=>x?.recognitionVersion!==undefined);
+  if(recognition.length) {
+    if(recognition.length!==1||documents.length!==1||!sceneReady)throw new Error('Import one recognition bundle after loading its scene.');
+    for(const path of recognitionAssets({recognitions:recognition}))assetPath(path);
+    const current=palace,currentMesh=mesh,currentHash=sceneHash,before=JSON.stringify(palace);
+    notice('Checking recognized regions against both source views…');
+    const sidecar=await importRecognition(recognition[0],nextAssets,palace,mesh,sceneHash,resolveAsset);
+    requireEditable();
+    if(palace!==current||mesh!==currentMesh||sceneHash!==currentHash||JSON.stringify(palace)!==before)throw new Error('Scene changed during recognition. Import again.');
+    const next={...palace,objectMemory:sidecar};validatePalace(next);palace=next;assets=nextAssets;renderUI();
+    notice(`${sidecar.objects.length} supported object regions; ${sidecar.rejections.length} unsupported proposals rejected. Inspect source views, then confirm.`);return;
+  }
   let next = structuredClone(palace);
   // Full palace establishes assembly; scene and memory handoffs can then augment it.
   const full = documents.filter(x => !Array.isArray(x) && x.schemaVersion !== undefined && 'scene' in x);
@@ -322,4 +348,5 @@ try {
   if (stored) { palace = validatePalace(stored.palace); if (!frozen()) completeAnchors(palace); assets = new Map(stored.assets); selected = palace.anchors[0].id; notice('Restored the saved palace and its local assets.'); }
 } catch (error) { notice(`Saved palace unavailable: ${error.message}. Reimport your bundle.`); }
 mountCapture({importFiles, requireEditable, sceneReady:()=>sceneReady});
+objectUI = renderer ? mountObjectMemory({getPalace:()=>palace,getAssets:()=>assets,getMesh:()=>sceneReady?mesh:null,getHash:()=>sceneHash,camera,controls,canvas:renderer.domElement,notice,requireEditable,openMemory:id=>{const anchor=palace.anchors.find(a=>a.memoryIds.includes(id));if(anchor)selected=anchor.id;activeMemory=id;recall=null;renderUI();}}) : null;
 renderUI(); await loadScene();
